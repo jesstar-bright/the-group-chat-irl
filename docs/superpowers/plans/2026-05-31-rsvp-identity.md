@@ -102,7 +102,7 @@ Find this line in `index.html`:
 Replace with:
 
 ```html
-<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" integrity="sha384-LM+CFh2zMjBg5Vsi2lQ6CWNgFnk7n5GHr/JeJVorlmd1Op4kFD0qB6pjA1+nWcMu" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous"></script>
 ```
 
 - [ ] **Step 2: Swap the ReactDOM script tag**
@@ -116,7 +116,7 @@ Find this line in `index.html`:
 Replace with:
 
 ```html
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" integrity="sha384-9Jx9R8mPziWPpInyVx6yKtkBPnNQGzWGI/SP6sFvfZ1pCcDqgEoQUm8X4tjUfHpz" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous"></script>
 ```
 
 - [ ] **Step 3: Verify the integrity hashes match the live files**
@@ -131,9 +131,9 @@ for u in react@18.3.1/umd/react.production.min.js react-dom@18.3.1/umd/react-dom
 Expected output (must match the `integrity=` values above exactly):
 ```
 react@18.3.1/umd/react.production.min.js
-LM+CFh2zMjBg5Vsi2lQ6CWNgFnk7n5GHr/JeJVorlmd1Op4kFD0qB6pjA1+nWcMu
+DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z
 react-dom@18.3.1/umd/react-dom.production.min.js
-9Jx9R8mPziWPpInyVx6yKtkBPnNQGzWGI/SP6sFvfZ1pCcDqgEoQUm8X4tjUfHpz
+gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1
 ```
 
 - [ ] **Step 4: Commit**
