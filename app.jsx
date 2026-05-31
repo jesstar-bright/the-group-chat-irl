@@ -424,15 +424,43 @@ function SubscribeSheet({ onClose, toast }) {
 
 /* ---------------- lightbox ---------------- */
 function Lightbox({ m, idx, setIdx, onClose }) {
+  const n = m.media.length;
   const md = m.media[idx];
+  const go = (d) => setIdx((idx + d + n) % n);
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'ArrowRight') go(1);
+      else if (e.key === 'ArrowLeft') go(-1);
+      else if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [idx]);
+  const touchX = useRef(null);
+  const onTouchStart = (e) => { touchX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e) => {
+    if (touchX.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX.current = null;
+  };
   return (
     <div className="lbox" onClick={onClose}>
-      <div className="lbtop"><button className="lbclose" onClick={onClose}>{I.close}</button></div>
-      <div className="lbstage" onClick={(e) => e.stopPropagation()}>
+      <div className="lbtop">
+        <span className="lbcount">{n > 1 ? (idx + 1) + ' / ' + n : ''}</span>
+        <button className="lbclose" onClick={onClose} aria-label="Close">{I.close}</button>
+      </div>
+      <div className="lbstage" onClick={(e) => e.stopPropagation()} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {md.type === 'video'
           ? <iframe src={'https://drive.google.com/file/d/' + md.id + '/preview'} allow="autoplay" />
           : <img src={GC.drivePhoto(md.id, 1600)} alt="" />}
       </div>
+      {n > 1 && (
+        <React.Fragment>
+          <button className="lbnav prev" onClick={(e) => { e.stopPropagation(); go(-1); }} aria-label="Previous photo">{I.back}</button>
+          <button className="lbnav next" onClick={(e) => { e.stopPropagation(); go(1); }} aria-label="Next photo">{I.chev}</button>
+        </React.Fragment>
+      )}
     </div>
   );
 }
@@ -510,7 +538,7 @@ function App() {
     <div className="gc">
       {head}
       {route.name === 'home' && <Home nav={nav} openSub={() => { setSub(true); }} t={t} count={count} events={events} live={live} />}
-      {route.name === 'agenda' && <Agenda nav={nav} events={events} live={live} />}
+      {route.name === 'agenda' && <Agenda nav={nav} events={events} />}
       {route.name === 'event' && ev && <EventDetail ev={ev} nav={nav} share={shareEvent} addCal={addCal} rsvp={rsvp} rsvpOn={!!rsvps[ev.id]} />}
       {route.name === 'memories' && <Memories nav={nav} />}
       {route.name === 'memory' && mem && <MemoryDetail m={mem} openLb={(i) => setLb({ idx: i })} share={shareMem} />}
