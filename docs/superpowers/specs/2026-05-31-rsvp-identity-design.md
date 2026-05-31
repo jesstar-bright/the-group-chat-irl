@@ -204,6 +204,8 @@ Babel-in-browser is intentionally retained (keeps the design workflow simple). N
 
 Minimal, practical protections to add before wide public use. These are intentionally lightweight so they fit the current Apps Script + Sheets infra.
 
+> **Launch scope (this iteration):** Build only the cheap, high-value items — **server-side validation & sanitization**, **field length limits**, **`https://`-only photo URLs**, and **client-side React escaping**. The heavier items (**rate limiting**, **CSP**, **admin/moderation view**, **CAPTCHA**, **server-side ID-token verification**) are **documented here but deferred** — add them when abuse appears or before a wider public launch. They are not part of the initial implementation plan.
+
 - **Server-side validation & sanitization (Apps Script):**
   - Reject POSTs missing required fields: `event`, `sid`, `name`.
   - Trim and normalize `name`; reject if empty after trim.
@@ -242,6 +244,8 @@ Minimal, practical protections to add before wide public use. These are intentio
 Add these checks to `BACKEND-SETUP.md` as a mandatory step before production deployment; include example `curl` tests that assert rejection of malformed inputs.
 
 ## 13. Data collection & retention (Appendix)
+
+> **Status: DEFERRED — not built in the initial launch.** This appendix describes a future analytics/retention pipeline (hashed `sid_hash` + `PEPPER`, an `Analytics` tab, `DailyAggregates`, a daily cron). The initial implementation keeps the **raw `sid`** data model used by the existing `track.js` / `Sheet1` and the new `RSVPs` tab (§4) — it does **not** introduce `sid_hash` or the analytics pipeline. Treat this section as a design reference for a later iteration, kept here so the privacy thinking isn't lost.
 
 Principles
 - Minimize PII: default to anonymous `sid` and aggregates; collect names/photos only when explicitly needed for the roster and with consent.
