@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Story — The Group Chat: IRL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" />
+<style>
+  :root{
+    --bg:#fbfcfd; --surf:#ffffff; --ink:#11161c; --ink2:#586271; --ink3:#9aa4b2;
+    --line:#e9edf2; --acc:#2f7cc0; --acc-soft:#eaf2fb; --acc-ink:#1d5e9a;
+  }
+  *{ box-sizing:border-box; margin:0; }
+  body{ background:#33393f; font-family:"Hanken Grotesk",system-ui,sans-serif; padding:40px;
+    -webkit-font-smoothing:antialiased; }
+  .label{ color:#cfd6de; font-size:13px; margin-bottom:18px; max-width:380px; line-height:1.5; }
+
+  /* 9:16 story canvas — export at 1080x1920 */
+  .story{ width:380px; height:675px; border-radius:30px; overflow:hidden; position:relative;
+    background:linear-gradient(168deg,#eff5fc 0%,#e1edf9 52%,#d7e7f7 100%); color:var(--ink);
+    box-shadow:0 28px 70px -28px rgba(16,30,50,.6); padding:54px 36px; display:flex;
+    flex-direction:column; }
+  .story .eyebrow{ font-size:11px; letter-spacing:.22em; text-transform:uppercase; font-weight:800; color:var(--acc-ink); }
+  .story h1{ font-size:40px; line-height:1.02; letter-spacing:-.03em; font-weight:800; margin-top:18px; }
+  .story h1 em{ font-style:italic; color:var(--acc-ink); }
+  .story .lede{ font-size:16px; line-height:1.5; color:var(--ink2); margin-top:20px; }
+  .lineup{ margin-top:22px; display:flex; flex-wrap:wrap; gap:8px; }
+  .pill{ font-size:12.5px; font-weight:700; color:var(--acc-ink); background:rgba(255,255,255,.7);
+    border:1px solid rgba(47,124,192,.22); padding:7px 13px; border-radius:999px; }
+  .spacer{ flex:1; }
+  /* placeholder where the IG link sticker goes */
+  .sticker{ background:var(--ink); color:#fff; border-radius:14px; padding:16px; text-align:center;
+    font-weight:800; font-size:16px; display:flex; align-items:center; justify-content:center; gap:9px; }
+  .sticker svg{ width:18px; height:18px; }
+  .stickernote{ text-align:center; font-size:12px; color:var(--ink3); margin-top:12px; font-weight:600; }
+</style>
+</head>
+<body>
+  <div class="label">Instagram Story (9:16). Screenshot, or export at 1080×1920. Then in IG, add the real <b>Link sticker</b> over the dark bar and point it at your URL.</div>
+
+  <div class="story">
+    <div class="eyebrow">The Group Chat · IRL</div>
+    <h1>the group chat,<br/>but make it <em>real.</em></h1>
+    <div class="lede">our whole summer on one calendar. subscribe once → never miss a plan.</div>
+    <div class="lineup">
+      <span class="pill">Pride</span>
+      <span class="pill">Star Party</span>
+      <span class="pill">Hilary Duff</span>
+      <span class="pill">Oregon Coast</span>
+      <span class="pill">Zion</span>
+      <span class="pill">Vietnam ✈️</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="sticker">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg>
+      tap to join
+    </div>
+    <div class="stickernote">beta — tell me what breaks 🙏</div>
+  </div>
+</body>
+</html>

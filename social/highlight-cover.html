@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Highlight Cover — The Group Chat: IRL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" />
+<style>
+  /* design tokens lifted straight from styles.css */
+  :root{
+    --bg:#fbfcfd; --surf:#ffffff; --ink:#11161c; --ink2:#586271; --ink3:#9aa4b2;
+    --line:#e9edf2; --acc:#2f7cc0; --acc-soft:#eaf2fb; --acc-ink:#1d5e9a;
+  }
+  *{ box-sizing:border-box; margin:0; }
+  body{ background:#33393f; font-family:"Hanken Grotesk",system-ui,sans-serif; display:flex;
+    flex-wrap:wrap; gap:28px; padding:40px; -webkit-font-smoothing:antialiased; }
+  .label{ width:100%; color:#cfd6de; font-size:13px; letter-spacing:.04em; }
+
+  /* IG highlight covers display in a 1:1 circle; export at 1080x1080 */
+  .cover-tile{ width:320px; height:320px; border-radius:50%; overflow:hidden;
+    background:linear-gradient(158deg,#eff5fc 0%,#e1edf9 100%); color:var(--acc-ink);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    box-shadow:0 20px 50px -20px rgba(16,30,50,.55); }
+  .cover-tile .glyph{ width:96px; height:96px; opacity:.85; }
+  .cover-tile .glyph svg{ width:100%; height:100%; }
+  .cover-tile .word{ font-size:26px; font-weight:800; letter-spacing:.02em; }
+
+  /* alt: solid accent version */
+  .cover-tile.solid{ background:linear-gradient(158deg,var(--acc) 0%,var(--acc-ink) 100%); color:#fff; }
+</style>
+</head>
+<body>
+  <div class="label">Instagram Highlight covers (1:1). Screenshot each circle, or export at 1080×1080. Two options — pick one.</div>
+
+  <!-- Option A: soft blue date-tile (matches .cover) -->
+  <div class="cover-tile">
+    <div class="glyph">
+      <!-- calendar glyph in your accent ink -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4.5" width="18" height="16" rx="2.5"/>
+        <path d="M3 9h18M8 2.5v4M16 2.5v4"/>
+        <circle cx="8.5" cy="13" r="1.1" fill="currentColor" stroke="none"/>
+        <circle cx="12" cy="13" r="1.1" fill="currentColor" stroke="none"/>
+        <circle cx="15.5" cy="13" r="1.1" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="word">the calendar</div>
+  </div>
+
+  <!-- Option B: solid accent sun -->
+  <div class="cover-tile solid">
+    <div class="glyph">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4.2"/>
+        <path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+      </svg>
+    </div>
+    <div class="word">join us</div>
+  </div>
+</body>
+</html>

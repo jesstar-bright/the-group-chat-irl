@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Carousel — The Group Chat: IRL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" />
+<style>
+  :root{
+    --bg:#fbfcfd; --surf:#ffffff; --ink:#11161c; --ink2:#586271; --ink3:#9aa4b2;
+    --line:#e9edf2; --acc:#2f7cc0; --acc-soft:#eaf2fb; --acc-ink:#1d5e9a;
+  }
+  *{ box-sizing:border-box; margin:0; }
+  body{ background:#33393f; font-family:"Hanken Grotesk",system-ui,sans-serif; padding:40px;
+    display:flex; flex-wrap:wrap; gap:26px; -webkit-font-smoothing:antialiased; }
+  .label{ width:100%; color:#cfd6de; font-size:13px; line-height:1.5; max-width:640px; }
+
+  /* 4:5 feed slides — export each at 1080x1350 */
+  .slide{ width:340px; height:425px; border-radius:24px; overflow:hidden; position:relative;
+    background:var(--bg); color:var(--ink); padding:40px 34px; display:flex; flex-direction:column;
+    box-shadow:0 22px 55px -25px rgba(16,30,50,.6); }
+  .slide .eyebrow{ font-size:10.5px; letter-spacing:.22em; text-transform:uppercase; font-weight:800; color:var(--ink3); }
+  .slide h1{ font-size:34px; line-height:1.04; letter-spacing:-.03em; font-weight:800; }
+  .slide h2{ font-size:27px; line-height:1.08; letter-spacing:-.025em; font-weight:800; }
+  .slide .lede{ font-size:15px; line-height:1.5; color:var(--ink2); }
+  .slide em{ font-style:italic; color:var(--acc-ink); }
+  .spacer{ flex:1; }
+  .mt12{ margin-top:12px; } .mt18{ margin-top:18px; } .mt22{ margin-top:22px; }
+
+  /* accent slide */
+  .slide.acc{ background:linear-gradient(158deg,var(--acc) 0%,var(--acc-ink) 100%); color:#fff; }
+  .slide.acc .eyebrow{ color:rgba(255,255,255,.8); }
+  .slide.acc em{ color:#dcebfb; }
+
+  /* soft slide */
+  .slide.soft{ background:linear-gradient(168deg,#eff5fc 0%,#e1edf9 100%); }
+  .slide.soft .eyebrow{ color:var(--acc-ink); }
+
+  /* lineup list */
+  .lineup{ list-style:none; padding:0; }
+  .lineup li{ display:flex; align-items:baseline; gap:10px; font-size:18px; font-weight:800;
+    letter-spacing:-.01em; padding:9px 0; border-top:1px solid var(--line); }
+  .lineup li:first-child{ border-top:none; }
+  .lineup li .dt{ font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--acc-ink); width:54px; flex:0 0 auto; }
+
+  /* swipe hint */
+  .swipe{ position:absolute; right:26px; bottom:24px; font-size:12px; font-weight:800; color:var(--ink3);
+    display:flex; align-items:center; gap:5px; }
+  .slide.acc .swipe{ color:rgba(255,255,255,.85); }
+  .pagenum{ position:absolute; left:34px; bottom:24px; font-size:12px; font-weight:800; color:var(--ink3); }
+  .slide.acc .pagenum{ color:rgba(255,255,255,.7); }
+
+  .cta-btn{ background:#fff; color:var(--acc-ink); font-weight:800; font-size:16px; border-radius:13px;
+    padding:15px; text-align:center; }
+</style>
+</head>
+<body>
+  <div class="label">Feed carousel — 5 slides (4:5). Screenshot each, or export at 1080×1350. Post in order. Caption is in the chat. Swap any slide's background by changing its class (plain / <code>soft</code> / <code>acc</code>).</div>
+
+  <!-- 1 · hook -->
+  <div class="slide soft">
+    <div class="eyebrow">The Group Chat · IRL</div>
+    <div class="spacer"></div>
+    <h1>I built our<br/>group chat a<br/><em>real</em> calendar 🌅</h1>
+    <div class="lede mt18">one link. our entire summer.</div>
+    <div class="spacer"></div>
+    <div class="pagenum">1 / 5</div>
+    <div class="swipe">swipe →</div>
+  </div>
+
+  <!-- 2 · promise -->
+  <div class="slide acc">
+    <div class="eyebrow">How it works</div>
+    <div class="spacer"></div>
+    <h2>We plan it.<br/>We book it.<br/>We round<br/>everyone up.</h2>
+    <div class="lede mt18" style="color:#dcebfb;">All you do is show up.</div>
+    <div class="spacer"></div>
+    <div class="pagenum">2 / 5</div>
+    <div class="swipe">swipe →</div>
+  </div>
+
+  <!-- 3 · lineup -->
+  <div class="slide">
+    <div class="eyebrow">Summer 2026 · the lineup</div>
+    <ul class="lineup mt18">
+      <li><span class="dt">Jun 7</span>Utah Pride</li>
+      <li><span class="dt">Jun 10</span>Star Party</li>
+      <li><span class="dt">Jul 17</span>Hilary Duff</li>
+      <li><span class="dt">Aug 5</span>Oregon Coast</li>
+      <li><span class="dt">Sep 4</span>Zion</li>
+      <li><span class="dt">Sep 25</span>Vietnam ✈️</li>
+    </ul>
+    <div class="spacer"></div>
+    <div class="pagenum">3 / 5</div>
+    <div class="swipe">swipe →</div>
+  </div>
+
+  <!-- 4 · subscribe -->
+  <div class="slide soft">
+    <div class="eyebrow">Subscribe once</div>
+    <div class="spacer"></div>
+    <h2>Every new plan<br/>lands in the<br/>calendar you<br/><em>already check.</em></h2>
+    <div class="lede mt18">No “wait, when is that?” ever again.</div>
+    <div class="spacer"></div>
+    <div class="pagenum">4 / 5</div>
+    <div class="swipe">swipe →</div>
+  </div>
+
+  <!-- 5 · cta -->
+  <div class="slide acc">
+    <div class="eyebrow">Come hang</div>
+    <div class="spacer"></div>
+    <h1 style="color:#fff;">Link in bio.<br/>Come hang. ☀️</h1>
+    <div class="lede mt22" style="color:#dcebfb;">(beta — drag your people in 🙏)</div>
+    <div class="mt22"><div class="cta-btn">subscribe to the calendar →</div></div>
+    <div class="spacer"></div>
+    <div class="pagenum">5 / 5</div>
+  </div>
+</body>
+</html>
