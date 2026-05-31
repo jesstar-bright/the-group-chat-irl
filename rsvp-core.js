@@ -16,7 +16,22 @@
     return COLORS[h % COLORS.length];
   }
 
-  var RSVPCore = { COLORS: COLORS, initials: initials, colorFor: colorFor };
+  function sanitizeName(name) {
+    var s = String(name == null ? '' : name);
+    s = s.replace(/[\x00-\x1F<>]/g, ''); // control chars + angle brackets
+    s = s.replace(/\s+/g, ' ').trim();
+    return s.slice(0, 50);
+  }
+
+  function isValidPhotoUrl(url) {
+    var s = String(url == null ? '' : url).trim();
+    if (s.length === 0 || s.length > 200) return false;
+    if (/\s/.test(s)) return false;
+    return /^https:\/\//i.test(s);
+  }
+
+  var RSVPCore = { COLORS: COLORS, initials: initials, colorFor: colorFor,
+    sanitizeName: sanitizeName, isValidPhotoUrl: isValidPhotoUrl };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = RSVPCore;
   if (root) root.RSVPCore = RSVPCore;
