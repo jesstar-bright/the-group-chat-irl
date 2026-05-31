@@ -5,6 +5,15 @@
 (function () {
   // Public Google Calendar (from the original site).
   const CAL_ID = '3179309fd12b282465b51c255a015281f95693867608c11ded8531d961fd099d@group.calendar.google.com';
+
+  // ── Live upcoming-event count ───────────────────────────────
+  // Paste a Google Calendar API key here to make the displayed count
+  // reflect the REAL shared calendar (incl. events Gaby/Jess add in
+  // Google beyond the curated list below). Leave '' to use the
+  // date-filtered count of the curated events — works offline today.
+  // Make a key: console.cloud.google.com → APIs & Services → Credentials
+  // → Create API key → restrict to "Google Calendar API".
+  const CAL_API_KEY = 'AIzaSyC_POY0P4OFLQmr5oh1tLQVGxkfG-DC30E';
   const CAL = {
     id: CAL_ID,
     // "Add by URL" deep-link (opens Google Calendar add-calendar dialog)
@@ -179,5 +188,114 @@
     },
   ];
 
-  window.GC = { CAL, EVENTS, MEMORIES, gcalLink, drivePhoto, driveThumb };
+  // Curated events whose date is still in the future (past ones drop off).
+  function upcomingEvents() {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return EVENTS
+      .filter((ev) => new Date((ev.end || ev.start) + 'T23:59:59') >= today)
+      .sort((a, b) => a.start.localeCompare(b.start));
+  }
+
+  // ── Live Google Calendar → event cards ──────────────────────
+  const _MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const _DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const _p2 = (n) => String(n).padStart(2, '0');
+  const _fmtDate = (d) => d.getFullYear() + '-' + _p2(d.getMonth() + 1) + '-' + _p2(d.getDate());
+  const _fmtTime = (d) => { let h = d.getHours(), m = d.getMinutes(); const ap = h < 12 ? 'AM' : 'PM'; h = h % 12 || 12; return h + (m ? ':' + _p2(m) : '') + ' ' + ap; };
+
+  // pick an activity glyph from words in the title/location
+  function guessGlyphKey(text) {
+    const s = (text || '').toLowerCase();
+    const has = (...w) => w.some((x) => s.includes(x));
+    if (has('hike','trail','peak','mountain','climb','canyon','summit','ski','snow')) return 'mtn';
+    if (has('coffee','brunch','dinner','lunch','breakfast','eat','food','cafe','drinks','bar')) return 'cup';
+    if (has('concert','music','show','duff','tour','dj','band')) return 'music';
+    if (has('game','baseball','bees','basketball','hockey','soccer','match','race','raceway')) return 'ball';
+    if (has('springs','soak','pool','lake','river','paddle','sup','kayak','beach','coast','swim','water')) return 'waves';
+    if (has('flight','vietnam','abroad','passport','international','airport','japan','europe','trip')) return 'plane';
+    if (has('star','sunset','night','observatory','astronomy')) return 'star';
+    if (has('pride','festival','party','celebrate','birthday','market','fair')) return 'sparkle';
+    if (has('rodeo','ranch','western')) return 'flag';
+    return 'star';
+  }
+
+  // turn a calendar event description into blurb / what-to-expect / bring list.
+  // Conventions Gaby & Jess can use in the event description:
+  //   • first line = the one-liner shown on the card
+  //   • a line starting "Bring:" becomes the packing checklist (comma-separated)
+  function parseDesc(desc) {
+    if (!desc) return { blurb: '', expect: '', bring: [] };
+    const text = desc.replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|li)>/gi, '\n')
+      .replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').trim();
+    const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+    let bring = []; const kept = [];
+    lines.forEach((l) => {
+      const m = l.match(/^bring\s*:\s*(.+)$/i);
+      if (m) bring = m[1].split(/[,;]/).map((s) => s.trim()).filter(Boolean);
+      else kept.push(l);
+    });
+    return { blurb: kept[0] || '', expect: kept.join(' '), bring };
+  }
+
+  function _parseStart(it) {
+    if (it.start && it.start.dateTime) return { d: new Date(it.start.dateTime), hasTime: true };
+    const p = ((it.start && it.start.date) || '1970-01-01').split('-').map(Number);
+    return { d: new Date(p[0], p[1] - 1, p[2]), hasTime: false };
+  }
+  function _parseEnd(it, start) {
+    if (it.end && it.end.dateTime) return { d: new Date(it.end.dateTime), hasTime: true };
+    if (it.end && it.end.date) { const p = it.end.date.split('-').map(Number); const d = new Date(p[0], p[1] - 1, p[2]); d.setDate(d.getDate() - 1); return { d, hasTime: false }; }
+    return { d: start.d, hasTime: start.hasTime };
+  }
+  function _formatWhen(s, e) {
+    const sDow = _DOW[s.d.getDay()], sMo = _MO[s.d.getMonth()], sDate = s.d.getDate();
+    if (s.hasTime) return sDow + ' · ' + sMo + ' ' + sDate + ' · ' + _fmtTime(s.d);
+    if (_fmtDate(s.d) === _fmtDate(e.d)) return sDow + ' · ' + sMo + ' ' + sDate;
+    const eMo = _MO[e.d.getMonth()], eDate = e.d.getDate(), eDow = _DOW[e.d.getDay()];
+    if (sMo === eMo) return sDow + ' → ' + eDow + ' · ' + sMo + ' ' + sDate + '–' + eDate;
+    return sMo + ' ' + sDate + ' → ' + eMo + ' ' + eDate;
+  }
+
+  function mapGEvent(it) {
+    const s = _parseStart(it), e = _parseEnd(it, s);
+    const d = parseDesc(it.description);
+    const multi = _fmtDate(s.d) !== _fmtDate(e.d);
+    return {
+      id: it.id,
+      title: it.summary || 'Untitled plan',
+      start: _fmtDate(s.d),
+      end: _fmtDate(e.d),
+      place: it.location || '',
+      when: _formatWhen(s, e),
+      kind: multi ? 'Multi-day' : 'On the calendar',
+      cap: 'photo · ' + (it.summary || 'plan').toLowerCase(),
+      blurb: d.blurb || (it.summary || ''),
+      expect: d.expect || 'Details land here as Gaby & Jess fill in the calendar event. Tap “Add to calendar” so you don’t miss it.',
+      bring: d.bring,
+      facts: [],
+      glyph: guessGlyphKey((it.summary || '') + ' ' + (it.location || '')),
+      htmlLink: it.htmlLink || '',
+      live: true,
+    };
+  }
+
+  // Fetch upcoming events from the public shared calendar and map them to cards.
+  // Returns an array when CAL_API_KEY is set + fetch succeeds, else null
+  // (caller falls back to the curated EVENTS so the site always works).
+  async function fetchEvents() {
+    if (!CAL_API_KEY) return null;
+    try {
+      const url = 'https://www.googleapis.com/calendar/v3/calendars/'
+        + encodeURIComponent(CAL_ID) + '/events?key=' + CAL_API_KEY
+        + '&timeMin=' + new Date().toISOString()
+        + '&singleEvents=true&orderBy=startTime&maxResults=250';
+      const r = await fetch(url);
+      if (!r.ok) return null;
+      const j = await r.json();
+      if (!Array.isArray(j.items)) return null;
+      return j.items.filter((it) => it.status !== 'cancelled' && (it.start && (it.start.date || it.start.dateTime))).map(mapGEvent);
+    } catch (e) { return null; }
+  }
+
+  window.GC = { CAL, EVENTS, MEMORIES, gcalLink, drivePhoto, driveThumb, upcomingEvents, fetchEvents, hasLiveKey: !!CAL_API_KEY };
 })();

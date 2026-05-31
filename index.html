@@ -9,8 +9,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" />
 <link rel="stylesheet" href="styles.css" />
 <style>
-  html, body { margin: 0; padding: 0; background: #eceef1; }
+  html, body { margin: 0; padding: 0; }
+  /* cool airy page bg shows only around the column on tablet/desktop */
+  body { background: #e9eef4; }
   #root { min-height: 100vh; }
+  @media (max-width:519px){ body { background: #fbfcfd; } }
 </style>
 </head>
 <body>
@@ -30,7 +33,7 @@
 
 <script src="data.js"></script>
 <script src="track.js"></script>
-<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
 <script type="text/babel" src="app.jsx"></script>
 </body>
 </html>

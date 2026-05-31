@@ -61,7 +61,7 @@ function DateCover({ ev, big }) {
   const { d, mo } = ymd(ev.start);
   return (
     <div className={'cover' + (big ? ' big' : '')}>
-      <div className="cv-top"><span className="cv-kind">{ev.kind}</span><span className="cv-glyph">{GL[GLYPH[ev.id]] || GL.star}</span></div>
+      <div className="cv-top"><span className="cv-kind">{ev.kind}</span><span className="cv-glyph">{GL[ev.glyph || GLYPH[ev.id]] || GL.star}</span></div>
       <div>
         <div className="cv-date"><span className="d">{d}</span><span className="mo">{mo}</span></div>
         {big && <div className="cv-place">{ev.place}</div>}
@@ -69,7 +69,7 @@ function DateCover({ ev, big }) {
     </div>
   );
 }
-function GlyphTile({ ev }) { return <div className="gtile">{GL[GLYPH[ev.id]] || GL.star}</div>; }
+function GlyphTile({ ev }) { return <div className="gtile">{GL[ev.glyph || GLYPH[ev.id]] || GL.star}</div>; }
 
 /* ---------------- header ---------------- */
 function Head({ mode, title, onBack, onAction, scrolled }) {
@@ -97,38 +97,112 @@ function Head({ mode, title, onBack, onAction, scrolled }) {
 /* ====================================================================
    SCREENS
    ==================================================================== */
-function Home({ nav, openSub }) {
-  const up = GC.EVENTS.slice(0, 2);
+/* ---- tweakable hero config (eyebrow / welcome line / accent) ---- */
+const EYEBROWS = [
+  "From SLC, exploring everywhere",
+  "SLC-based · adventures near & far",
+  "From SLC to everywhere · {n} plans",
+  "Home base: SLC · plans all over",
+  "Your crew, your calendar · {n} plans",
+  "Salt Lake City · {n} plans on the calendar",
+];
+const LEDES = {
+  "Standing invite": "Consider this your standing invite. Gaby & Jess keep the plans coming — subscribe once and you’ll never miss one. It’s always better when you’re there.",
+  "We want you there": "We plan it, we book it, we round everyone up — all you do is show up. Subscribe once and you’re in on everything, and we’d genuinely love to have you along.",
+  "Short & sweet": "Gaby & Jess keep the plans coming. Subscribe once, never miss one — it’s always better with you there.",
+};
+const ACCENTS = [
+  ["#2f7cc0", "#1d5e9a", "#eaf2fb"], // sky (brand)
+  ["#1f6aa8", "#154d7d", "#e7f0f8"], // deep ocean
+  ["#3b86d8", "#2563ad", "#ecf3fc"], // bright
+  ["#2c8fa6", "#1e6b7e", "#e6f3f6"], // blue-teal
+];
+const TWEAK_DEFAULTS = {
+  eyebrow: "Your crew, your calendar · {n} plans",
+  eyebrowCustom: "",
+  lede: "Standing invite",
+  accent: ["#2c8fa6", "#1e6b7e", "#e6f3f6"],
+};
+
+/* horizontal snap carousel with Instagram-style dots + right-edge fade hint */
+function Carousel({ children }) {
+  const ref = useRef(null);
+  const [active, setActive] = useState(0);
+  const [atEnd, setAtEnd] = useState(false);
+  const n = React.Children.count(children);
+  const onScroll = () => {
+    const el = ref.current; if (!el) return;
+    const cards = el.children;
+    const x = el.scrollLeft + 24;
+    let best = 0, bestD = Infinity;
+    for (let i = 0; i < cards.length; i++) {
+      const d = Math.abs(cards[i].offsetLeft - x);
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    const end = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+    setAtEnd(end);
+    setActive(end ? cards.length - 1 : best);
+  };
+  useEffect(() => { onScroll(); }, []);
+  const go = (i) => {
+    const el = ref.current; if (!el || !el.children[i]) return;
+    el.scrollTo({ left: el.children[i].offsetLeft - 20, behavior: 'smooth' });
+  };
+  return (
+    <div className="carousel-wrap">
+      <div className="carousel" ref={ref} onScroll={onScroll}>{children}</div>
+      <div className={'carousel-fade' + (atEnd ? ' hide' : '')} aria-hidden="true" />
+      <div className="dots" role="tablist">
+        {Array.from({ length: n }).map((_, i) => (
+          <button key={i} className={'dot' + (i === active ? ' on' : '')} aria-label={'Go to card ' + (i + 1)} onClick={() => go(i)} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Home({ nav, openSub, t, count, events, live }) {
+  const rawEyebrow = (t.eyebrowCustom && t.eyebrowCustom.trim()) ? t.eyebrowCustom : t.eyebrow;
+  const eyebrowText = rawEyebrow.replace('{n}', count);
+  const ledeText = LEDES[t.lede] || LEDES["Standing invite"];
   return (
     <div className="view">
       <Head mode="home" />
       <div className="pad" style={{ paddingTop: 8 }}>
-        <div className="eyebrow">Summer in Utah · {GC.EVENTS.length} plans locked</div>
-        <h1 className="d1">Touch grass<br />with the crew.</h1>
-        <p className="lede">Gaby &amp; Jess plan it, you just show up. Subscribe once and every hike, soak &amp; slope lands in your calendar.</p>
+        <div className="eyebrow">{eyebrowText}</div>
+        <h1 className="d1">The Group Chat:<br /><span style={{ color: 'var(--acc)' }}>IRL</span></h1>
+        <p className="lede">{ledeText}</p>
         <div style={{ marginTop: 18 }} />
         <button className="btn acc" onClick={openSub}>{I.cal}<span>Subscribe to the calendar</span></button>
         <div className="subnote">Adds to Google · Apple · Outlook — auto-updates forever</div>
+        {live && <div className="subnote" style={{ color: 'var(--acc-ink)', fontWeight: 700, marginTop: 6 }}>● Live — these plans come straight from our Google Calendar</div>}
       </div>
 
-      <div className="pad" style={{ marginTop: 30 }}>
-        <div className="sech"><h2>Next up</h2><button className="more" onClick={() => nav('agenda')}>See all {GC.EVENTS.length}{I.chev}</button></div>
-        {up.map((ev) => (
-          <button key={ev.id} className="ecard" onClick={() => nav('event', ev.id)}>
-            <DateCover ev={ev} />
-            <div className="body">
-              <div className="when">{ev.when}</div>
-              <h3>{ev.title}</h3>
-              <div className="meta">{ev.place}</div>
-              <div className="row"><Faces /><span className="pill">What to expect →</span></div>
-            </div>
+      <div style={{ marginTop: 30 }}>
+        <div className="pad"><div className="sech"><h2>Next up</h2></div></div>
+        <Carousel>
+          {events.slice(0, 3).map((ev) => (
+            <button key={ev.id} className="ecard" onClick={() => nav('event', ev.id)}>
+              <DateCover ev={ev} />
+              <div className="body">
+                <div className="when">{ev.when}</div>
+                <h3>{ev.title}</h3>
+                <div className="meta">{ev.place}</div>
+                <div className="row"><Faces /><span className="pill">What to expect →</span></div>
+              </div>
+            </button>
+          ))}
+          <button className="seeall-card" onClick={() => nav('agenda')}>
+            <span className="sa-arrow">{I.chev}</span>
+            <span className="sa-t">See all {count}</span>
+            <span className="sa-s">the full lineup →</span>
           </button>
-        ))}
+        </Carousel>
       </div>
 
       <div className="pad" style={{ marginTop: 26 }}>
         <div className="band">
-          <div className="eyebrow">The whole summer</div>
+          <div className="eyebrow">All year, one calendar</div>
           <h3>One calendar, zero group-chat chaos.</h3>
           <p>Subscribe and the agenda lives in the calendar you already check. New plans appear automatically — no “wait, when is that?” ever again.</p>
           <button className="btn" onClick={openSub}>{I.cal}<span>Get the calendar</span></button>
@@ -152,17 +226,17 @@ function Home({ nav, openSub }) {
   );
 }
 
-function Agenda({ nav }) {
+function Agenda({ nav, events }) {
   return (
     <div className="view">
       <div className="pad" style={{ paddingTop: 6 }}>
-        <div className="eyebrow">Summer ’26</div>
+        <div className="eyebrow">All year · 2026</div>
         <h1 className="d1" style={{ fontSize: 30 }}>The agenda</h1>
         <p className="lede">Everything we’ve committed to, in order. Tap any plan to see what to expect.</p>
       </div>
       <div className="pad" style={{ marginTop: 18 }}>
         <div className="elist">
-          {GC.EVENTS.map((ev) => (
+          {events.map((ev) => (
             <button key={ev.id} className="erow" onClick={() => nav('event', ev.id)}>
               <GlyphTile ev={ev} />
               <div className="col">
@@ -191,7 +265,7 @@ function EventDetail({ ev, nav, share, addCal, rsvp, rsvpOn }) {
         <div className="chips" style={{ marginTop: 16 }}>
           <span className="chip">{I.cal}{ev.when.split(' · ').slice(0, 2).join(' · ')}</span>
           {ev.when.split(' · ')[2] && <span className="chip">{I.clock}{ev.when.split(' · ')[2]}</span>}
-          <span className="chip">{I.pin}{ev.place}</span>
+          {ev.place && <span className="chip">{I.pin}{ev.place}</span>}
         </div>
       </div>
 
@@ -200,18 +274,22 @@ function EventDetail({ ev, nav, share, addCal, rsvp, rsvpOn }) {
         <p>{ev.expect}</p>
       </div>
 
-      <div className="pad" style={{ marginTop: 22 }}>
-        <div className="facts4">
-          {ev.facts.map(([k, v], i) => <div key={i} className="f"><div className="k">{k}</div><div className="v">{v}</div></div>)}
+      {ev.facts && ev.facts.length > 0 && (
+        <div className="pad" style={{ marginTop: 22 }}>
+          <div className="facts4">
+            {ev.facts.map(([k, v], i) => <div key={i} className="f"><div className="k">{k}</div><div className="v">{v}</div></div>)}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="pad" style={{ marginTop: 22 }}>
-        <div className="sech"><h2>Bring</h2></div>
-        <ul className="checks">
-          {ev.bring.map((b, i) => <li key={i}><span className="dot">{I.chk}</span><div>{b}</div></li>)}
-        </ul>
-      </div>
+      {ev.bring && ev.bring.length > 0 && (
+        <div className="pad" style={{ marginTop: 22 }}>
+          <div className="sech"><h2>Bring</h2></div>
+          <ul className="checks">
+            {ev.bring.map((b, i) => <li key={i}><span className="dot">{I.chk}</span><div>{b}</div></li>)}
+          </ul>
+        </div>
+      )}
 
       <div className="pad" style={{ marginTop: 22 }}>
         <div className="whoin">
@@ -370,8 +448,24 @@ function App() {
   const [toastMsg, setToastMsg] = useState('');
   const [rsvps, setRsvps] = useState({});
   const [scrolled, setScrolled] = useState(false);
-  const scrollerRef = useRef(null);
   const toastT = useRef(0);
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  // apply accent palette (stays within the blues)
+  useEffect(() => {
+    const r = document.documentElement, p = t.accent;
+    if (Array.isArray(p)) { r.style.setProperty('--acc', p[0]); r.style.setProperty('--acc-ink', p[1]); r.style.setProperty('--acc-soft', p[2]); }
+  }, [t.accent]);
+
+  // Events: curated list now; swap to the LIVE Google Calendar when a key is set.
+  const [events, setEvents] = useState(() => GC.upcomingEvents());
+  const [live, setLive] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    GC.fetchEvents().then((evs) => { if (alive && evs && evs.length) { setEvents(evs); setLive(true); } });
+    return () => { alive = false; };
+  }, []);
+  const count = events.length;
 
   const toast = (msg) => { setToastMsg(msg); clearTimeout(toastT.current); toastT.current = setTimeout(() => setToastMsg(''), 1700); };
 
@@ -384,19 +478,14 @@ function App() {
   const back = () => { setStack((s) => { if (!s.length) { setRoute({ name: 'home', id: null }); return s; } const prev = s[s.length - 1]; setRoute(prev); return s.slice(0, -1); }); };
 
   // reset scroll + header state on route change
+  useEffect(() => { window.scrollTo(0, 0); setScrolled(false); }, [route]);
   useEffect(() => {
-    const sc = scrollerRef.current && scrollerRef.current.parentElement;
-    if (sc) { sc.scrollTop = 0; setScrolled(false); }
-  }, [route]);
-  useEffect(() => {
-    const sc = scrollerRef.current && scrollerRef.current.parentElement;
-    if (!sc) return;
-    const onScroll = () => setScrolled(sc.scrollTop > 6);
-    sc.addEventListener('scroll', onScroll);
-    return () => sc.removeEventListener('scroll', onScroll);
+    const onScroll = () => setScrolled(window.scrollY > 6);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const ev = route.name === 'event' ? GC.EVENTS.find((e) => e.id === route.id) : null;
+  const ev = route.name === 'event' ? (events.find((e) => e.id === route.id) || GC.EVENTS.find((e) => e.id === route.id)) : null;
   const mem = route.name === 'memory' ? GC.MEMORIES.find((e) => e.id === route.id) : null;
 
   const shareEvent = () => {
@@ -418,10 +507,10 @@ function App() {
   }
 
   return (
-    <div className="gc" ref={scrollerRef}>
+    <div className="gc">
       {head}
-      {route.name === 'home' && <Home nav={nav} openSub={() => { setSub(true); }} />}
-      {route.name === 'agenda' && <Agenda nav={nav} />}
+      {route.name === 'home' && <Home nav={nav} openSub={() => { setSub(true); }} t={t} count={count} events={events} live={live} />}
+      {route.name === 'agenda' && <Agenda nav={nav} events={events} live={live} />}
       {route.name === 'event' && ev && <EventDetail ev={ev} nav={nav} share={shareEvent} addCal={addCal} rsvp={rsvp} rsvpOn={!!rsvps[ev.id]} />}
       {route.name === 'memories' && <Memories nav={nav} />}
       {route.name === 'memory' && mem && <MemoryDetail m={mem} openLb={(i) => setLb({ idx: i })} share={shareMem} />}
@@ -429,26 +518,19 @@ function App() {
       {sub && <SubscribeSheet onClose={() => setSub(false)} toast={toast} />}
       {lb && mem && <Lightbox m={mem} idx={lb.idx} setIdx={(i) => setLb({ idx: i })} onClose={() => setLb(null)} />}
       <div className={'toast' + (toastMsg ? ' show' : '')}>{toastMsg}</div>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Hero eyebrow" />
+        <TweakSelect label="Preset" value={t.eyebrow} options={EYEBROWS.map((e) => ({ value: e, label: e.replace('{n}', count) }))} onChange={(v) => setTweak('eyebrow', v)} />
+        <TweakText label="Or write your own" value={t.eyebrowCustom} placeholder="Custom eyebrow…" onChange={(v) => setTweak('eyebrowCustom', v)} />
+        <TweakSection label="Welcome line" />
+        <TweakSelect label="Tone" value={t.lede} options={Object.keys(LEDES)} onChange={(v) => setTweak('lede', v)} />
+        <TweakSection label="Accent — stays in the blues" />
+        <TweakColor label="Shade" value={t.accent} options={ACCENTS} onChange={(v) => setTweak('accent', v)} />
+      </TweaksPanel>
     </div>
   );
 }
 
-/* ---------------- mount in iOS frame, scaled to viewport ---------------- */
-function Stage() {
-  const [scale, setScale] = useState(1);
-  useEffect(() => {
-    const fit = () => { const s = Math.min(1, (window.innerHeight - 40) / 874, (window.innerWidth - 32) / 402); setScale(s); };
-    fit(); window.addEventListener('resize', fit); return () => window.removeEventListener('resize', fit);
-  }, []);
-  return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#eceef1' }}>
-      <div style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}>
-        <IOSDevice>
-          <App />
-        </IOSDevice>
-      </div>
-    </div>
-  );
-}
-
-ReactDOM.createRoot(document.getElementById('root')).render(<Stage />);
+/* ---------------- mount responsively: full-bleed on phones, centered column on desktop ---------------- */
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);

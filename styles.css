@@ -12,8 +12,13 @@
 
 .gc{
   font-family:"Hanken Grotesk",system-ui,sans-serif;
-  background:var(--bg); color:var(--ink); min-height:100%;
+  background:var(--bg); color:var(--ink);
+  width:100%; max-width:480px; margin:0 auto; min-height:100vh; min-height:100dvh;
   -webkit-font-smoothing:antialiased; position:relative;
+}
+/* on anything wider than a phone, set the column off against the page bg */
+@media (min-width:520px){
+  .gc{ box-shadow:0 0 0 1px var(--line), 0 40px 90px -50px rgba(16,30,50,.45); }
 }
 .gc img{ display:block; max-width:100%; }
 .gc button{ font:inherit; color:inherit; cursor:pointer; border:none; background:none; padding:0; -webkit-tap-highlight-color:transparent; }
@@ -36,7 +41,7 @@
   background:rgba(251,252,253,.82); backdrop-filter:saturate(180%) blur(16px); -webkit-backdrop-filter:saturate(180%) blur(16px);
   border-bottom:1px solid transparent; transition:border-color .2s; }
 .apphead.scrolled{ border-bottom-color:var(--line); }
-.apphead .statusgap{ height:52px; }
+.apphead .statusgap{ height:max(10px, env(safe-area-inset-top)); }
 .apphead .bar{ height:48px; display:flex; align-items:center; gap:12px; padding:0 14px; }
 .apphead .back{ width:36px; height:36px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center;
   background:var(--surf); box-shadow:0 1px 2px rgba(16,30,50,.06); }
@@ -104,6 +109,31 @@
 .ecard .row{ display:flex; align-items:center; justify-content:space-between; margin-top:12px; }
 .pill{ font-size:11px; font-weight:700; color:var(--ink2); background:var(--bg); border:1px solid var(--line); padding:5px 11px; border-radius:999px; }
 .pill.acc{ background:var(--acc); color:#fff; border-color:var(--acc); }
+
+/* ---- Next-up carousel (horizontal, snap, Netflix-style peek) ---- */
+.carousel-wrap{ position:relative; }
+.carousel{ display:flex; gap:13px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
+  padding:6px 20px 12px; scrollbar-width:none; }
+.carousel::-webkit-scrollbar{ display:none; }
+.carousel .ecard{ flex:0 0 82%; max-width:330px; margin-bottom:0; scroll-snap-align:start; }
+.carousel .ecard .pic{ height:118px; }
+/* right-edge fade — hints there's more to swipe; fades out at the end */
+.carousel-fade{ position:absolute; top:0; right:0; bottom:34px; width:42px; pointer-events:none;
+  background:linear-gradient(to right, rgba(251,252,253,0), var(--bg)); opacity:1; transition:opacity .25s; }
+.carousel-fade.hide{ opacity:0; }
+/* Instagram-style dots */
+.dots{ display:flex; gap:6px; justify-content:center; align-items:center; padding:2px 0 4px; }
+.dots .dot{ width:6px; height:6px; border-radius:50%; background:var(--line); border:none; padding:0; cursor:pointer;
+  transition:width .28s cubic-bezier(.3,.8,.3,1), background .2s; }
+.dots .dot.on{ width:20px; border-radius:3px; background:var(--acc); }
+.seeall-card{ flex:0 0 58%; max-width:220px; scroll-snap-align:start; border:1.5px dashed var(--line); border-radius:16px;
+  background:var(--surf); display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:5px;
+  padding:20px; text-align:left; color:var(--ink); }
+.seeall-card .sa-arrow{ width:40px; height:40px; border-radius:50%; background:var(--acc-soft); color:var(--acc-ink);
+  display:flex; align-items:center; justify-content:center; margin-bottom:8px; }
+.seeall-card .sa-arrow svg{ width:19px; height:19px; }
+.seeall-card .sa-t{ font-size:18px; font-weight:800; letter-spacing:-.02em; }
+.seeall-card .sa-s{ font-size:12.5px; color:var(--ink2); font-weight:600; }
 
 /* ---- agenda list ---- */
 .elist{ border-top:1px solid var(--line); }
