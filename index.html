@@ -1,0 +1,3948 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Group Chat: IRL ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" />
+<style>
+  :root {
+    --bg:        #FFFFFF;
+    --bg-2:      #F7F7F8;
+    --bg-3:      #F1F1F4;
+    --ink:       #0A0A0A;
+    --ink-2:     #5C5C62;
+    --ink-3:     #9A9AA1;
+    --ink-on:    #FFFFFF;
+    --rule:      #E6E6EA;
+    --accent:    #00ADEF;
+    --accent-2:  #0095CC;
+    --accent-soft:#E5F5FB;
+    --warning:   #F5A623;
+    --ok:        #34C77B;
+
+    --serif: "Cormorant Garamond", "Times New Roman", serif;
+    --sans:  "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    --max:   1280px;
+    --gut:   48px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+  body { font-family: var(--sans); font-weight: 400; font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; cursor: pointer; background: none; border: none; padding: 0; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+
+  /* ================================================================
+     TOPBAR
+     ================================================================ */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--rule);
+    height: 64px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 0 32px;
+  }
+  .topbar .left { display: flex; align-items: center; gap: 18px; min-width: 0; }
+  .topbar .back {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--ink);
+    transition: background 120ms ease;
+  }
+  .topbar .back:hover { background: var(--bg-3); }
+  .topbar .back svg { width: 18px; height: 18px; }
+  .topbar .crumb {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar .crumb .sep { color: var(--ink-3); margin: 0 10px; font-weight: 400; }
+  .topbar .crumb .here { color: var(--ink); }
+  .topbar .brand {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    text-align: center;
+  }
+  .topbar .brand .amp { color: var(--accent); font-style: normal; }
+  .topbar .right { display: flex; align-items: center; justify-content: flex-end; gap: 14px; }
+  .topbar .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--ink);
+  }
+  .topbar .icon-btn:hover { background: var(--bg-3); }
+  .topbar .icon-btn svg { width: 18px; height: 18px; }
+  .topbar .invite {
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .topbar .invite:hover { border-color: var(--ink); }
+
+  /* ================================================================
+     VIEW SYSTEM
+     ================================================================ */
+  .view { display: none; }
+  .view.active { display: block; animation: viewIn 280ms cubic-bezier(0.2,0.7,0.2,1); }
+  @keyframes viewIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .container { max-width: var(--max); margin: 0 auto; padding: 0 var(--gut); }
+
+  /* ================================================================
+     HERO
+     ================================================================ */
+  .hero {
+    position: relative;
+    height: 520px;
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .hero.short { height: 360px; }
+  .hero .bg {
+    position: absolute; inset: 0;
+    z-index: -2;
+  }
+  .hero .scrim {
+    position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.6) 100%);
+  }
+  .hero .container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 48px;
+  }
+  .hero .eyebrow {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 88px;
+    line-height: 0.98;
+    letter-spacing: -0.015em;
+    margin: 0;
+    max-width: 900px;
+  }
+  .hero h1 .it { font-style: italic; }
+  .hero .sub {
+    margin-top: 22px;
+    font-size: 17px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.85);
+    max-width: 640px;
+    line-height: 1.5;
+  }
+  .hero .meta-row {
+    margin-top: 36px;
+    display: flex;
+    gap: 56px;
+    align-items: flex-end;
+  }
+  .hero .meta-row .item .lbl {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .hero .meta-row .item .val {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.1;
+  }
+  .hero .meta-row .item .val .it { font-style: italic; }
+
+  /* hero "photo" placeholders: textured gradient compositions */
+  .photo-zion-canyon {
+    background:
+      radial-gradient(120% 80% at 50% 100%, #6b1c0c 0%, transparent 55%),
+      radial-gradient(80% 60% at 20% 20%, #f0a060 0%, transparent 50%),
+      radial-gradient(70% 50% at 80% 0%, #f8d088 0%, transparent 50%),
+      linear-gradient(180deg, #2a0e08 0%, #4a1810 40%, #8c3a1a 75%, #c46a3a 100%);
+  }
+  .photo-zion-canyon::after {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(95deg,
+        transparent 0%, transparent 20%,
+        rgba(0,0,0,0.18) 21%, rgba(0,0,0,0.18) 23%,
+        transparent 24%, transparent 38%,
+        rgba(0,0,0,0.15) 39%, rgba(0,0,0,0.15) 41%,
+        transparent 42%, transparent 65%,
+        rgba(0,0,0,0.22) 66%, rgba(0,0,0,0.22) 68%,
+        transparent 69%);
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+  }
+  .photo-summer {
+    background:
+      radial-gradient(80% 60% at 80% 100%, #e57f5a 0%, transparent 55%),
+      radial-gradient(60% 50% at 15% 80%, #6090c8 0%, transparent 50%),
+      radial-gradient(100% 60% at 50% 0%, #f6c98b 0%, transparent 60%),
+      linear-gradient(180deg, #1a1820 0%, #3a3a4a 40%, #7a6a64 100%);
+  }
+  .photo-drive {
+    background:
+      radial-gradient(60% 40% at 30% 30%, #7a8298 0%, transparent 55%),
+      linear-gradient(180deg, #0a0e1a 0%, #1c2638 50%, #3a4458 100%);
+  }
+  .photo-canyon-overlook {
+    background:
+      radial-gradient(120% 70% at 70% 100%, #8c2f1a 0%, transparent 55%),
+      radial-gradient(60% 50% at 30% 60%, #f0a050 0%, transparent 50%),
+      radial-gradient(80% 50% at 50% 0%, #4a3060 0%, transparent 60%),
+      linear-gradient(180deg, #2a1840 0%, #5c2818 60%, #b86838 100%);
+  }
+  .photo-zion-shuttle {
+    background:
+      radial-gradient(70% 50% at 50% 100%, #4a6a48 0%, transparent 55%),
+      radial-gradient(60% 50% at 30% 30%, #c89858 0%, transparent 50%),
+      linear-gradient(180deg, #6a8c3a 0%, #8c6a3a 50%, #6c4828 100%);
+  }
+  .photo-beach {
+    background:
+      radial-gradient(60% 45% at 60% 100%, #d4a878 0%, transparent 50%),
+      radial-gradient(70% 50% at 30% 60%, #3a7090 0%, transparent 55%),
+      linear-gradient(180deg, #b8d0e0 0%, #6090a8 40%, #d8b888 100%);
+  }
+  .photo-mini-golf {
+    background:
+      radial-gradient(60% 50% at 70% 80%, #6a8a48 0%, transparent 55%),
+      radial-gradient(50% 40% at 30% 30%, #f0c060 0%, transparent 50%),
+      linear-gradient(180deg, #2a3a1a 0%, #4a6a2a 50%, #7a9a3a 100%);
+  }
+  .photo-misc-bees   { background: linear-gradient(180deg, #1a1a3a 0%, #2a3a6a 60%, #6080b8 100%); }
+  .photo-misc-craft  { background: linear-gradient(180deg, #2a1820 0%, #5a3a48 60%, #b88a7a 100%); }
+  .photo-misc-rodeo  { background: linear-gradient(180deg, #2a0e08 0%, #6a2818 50%, #c87848 100%); }
+  .photo-misc-stars  { background: linear-gradient(180deg, #050810 0%, #0a1828 40%, #1a2a48 100%); }
+  .photo-misc-brunch { background: linear-gradient(180deg, #3a2a40 0%, #886068 50%, #f0c4b0 100%); }
+  .photo-misc-race   { background: linear-gradient(180deg, #1a0e08 0%, #3a1810 50%, #6a3818 100%); }
+  .photo-misc-concert{
+    background:
+      radial-gradient(60% 50% at 30% 80%, #ff6aa8 0%, transparent 60%),
+      radial-gradient(50% 40% at 80% 20%, #f8b86a 0%, transparent 55%),
+      linear-gradient(180deg, #2a0a3a 0%, #5a1a5a 45%, #b03a6a 100%);
+  }
+  .photo-misc-coast  {
+    background:
+      radial-gradient(80% 50% at 50% 100%, #1a3a5a 0%, transparent 60%),
+      radial-gradient(60% 40% at 70% 10%, #f0c890 0%, transparent 55%),
+      linear-gradient(180deg, #0a1828 0%, #2a4a6a 50%, #6a8a9a 100%);
+  }
+  .photo-misc-pride {
+    background:
+      radial-gradient(80% 60% at 50% 100%, rgba(0,0,0,0.35) 0%, transparent 60%),
+      linear-gradient(135deg, #e84747 0%, #f0a040 18%, #ffd34d 36%, #4cc97e 56%, #3a8fd1 76%, #8b5acf 100%);
+  }
+  .photo-misc-vietnam {
+    background:
+      radial-gradient(70% 50% at 25% 90%, #d4a854 0%, transparent 55%),
+      radial-gradient(60% 40% at 80% 20%, #f0c890 0%, transparent 55%),
+      linear-gradient(180deg, #0e2a26 0%, #2a6850 45%, #6a9870 75%, #d4a854 100%);
+  }
+
+  /* ================================================================
+     SECTION / TYPE
+     ================================================================ */
+  section.block { padding: 88px 0; }
+  section.block.tight { padding: 56px 0; }
+  section.block.bg { background: var(--bg-2); }
+
+  .stamp {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+  .display {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 64px;
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 16px 0 0;
+  }
+  .display .it { font-style: italic; }
+  .display.sm { font-size: 44px; }
+  .display.xs { font-size: 32px; }
+  .body-lg { font-size: 19px; font-weight: 300; line-height: 1.55; color: var(--ink-2); max-width: 680px; }
+  .body-md { font-size: 16px; line-height: 1.55; color: var(--ink-2); }
+  .body-sm { font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+
+  /* ================================================================
+     ROW (drill-in)
+     ================================================================ */
+  .rows { border-top: 1px solid var(--rule); }
+  .row {
+    display: grid;
+    grid-template-columns: 56px 1fr auto auto;
+    column-gap: 24px;
+    align-items: center;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+    transition: padding 200ms ease, background 200ms ease;
+  }
+  .row:hover { padding-left: 8px; padding-right: 8px; }
+  .row .ix {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-style: italic;
+    color: var(--ink-3);
+    line-height: 1;
+  }
+  .row .title {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+  .row .sub {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--ink-2);
+    font-weight: 400;
+  }
+  .row .pill {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--ink-2);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+  .row .pill.warn { color: var(--warning); border-color: var(--warning); }
+  .row .pill.ok   { color: var(--ok); border-color: var(--ok); }
+  .row .chev {
+    color: var(--accent);
+    transition: transform 240ms cubic-bezier(0.2,0.7,0.2,1);
+  }
+  .row:hover .chev { transform: translateX(6px); }
+  .row .chev svg { width: 18px; height: 18px; display: block; }
+
+  /* ================================================================
+     CARD (summer hub events)
+     ================================================================ */
+  .events {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+  }
+  .event-card {
+    grid-column: span 4;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 240ms cubic-bezier(0.2,0.7,0.2,1), box-shadow 240ms ease;
+    display: flex; flex-direction: column;
+  }
+  .event-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 48px -16px rgba(0,0,0,0.18);
+  }
+  .event-card.feat { grid-column: span 6; }
+  .event-card .photo {
+    aspect-ratio: 16/9;
+    position: relative;
+    overflow: hidden;
+  }
+  .event-card.feat .photo { aspect-ratio: 16/9; }
+  .event-card .photo .label {
+    position: absolute; top: 16px; left: 16px;
+    background: rgba(255,255,255,0.95);
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border-radius: 3px;
+  }
+  .event-card .photo .label.next {
+    background: var(--accent);
+    color: white;
+  }
+  .event-card .body {
+    padding: 24px 24px 26px;
+    display: flex; flex-direction: column; gap: 8px;
+    flex: 1;
+  }
+  .event-card .date {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+  .event-card h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 26px;
+    line-height: 1.1;
+    color: var(--ink);
+    margin: 4px 0 0;
+  }
+  .event-card.feat h3 { font-size: 34px; }
+  .event-card .desc {
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 6px;
+    flex: 1;
+  }
+  .event-card .foot {
+    margin-top: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .event-card .foot .arrow { transition: transform 240ms ease; }
+  .event-card:hover .foot .arrow { transform: translateX(4px); }
+  .event-card .tix {
+    margin-top: 12px;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 7px 14px;
+    align-self: flex-start;
+    transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+  }
+  .event-card .tix:hover { border-color: var(--ink); background: var(--ink); color: var(--ink-on); }
+  .event-card .meta {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+    display: flex; flex-direction: column; gap: 6px;
+    font-size: 12px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+  .event-card .meta-row { display: flex; align-items: baseline; gap: 4px; }
+  .event-card .meta-k {
+    color: var(--ink-3);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    flex-shrink: 0;
+    min-width: 52px;
+  }
+  .event-card .meta a { color: var(--accent); text-decoration: none; }
+  .event-card .meta a:hover { text-decoration: underline; }
+  .event-card .meta .sep { color: var(--ink-3); margin: 0 6px; }
+
+  /* ================================================================
+     MEMORIES
+     ================================================================ */
+  .memories-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+  }
+  .memory-card {
+    grid-column: span 6;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 240ms cubic-bezier(0.2,0.7,0.2,1), box-shadow 240ms ease;
+    display: flex; flex-direction: column;
+    text-align: left;
+  }
+  .memory-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+  }
+  .memory-card .cover {
+    aspect-ratio: 16/10;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .memory-card .cover::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%);
+  }
+  .memory-card .cover .pill {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: rgba(255,255,255,0.92);
+    color: var(--ink);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 999px;
+    z-index: 1;
+  }
+  .memory-card .cover .count {
+    position: absolute;
+    bottom: 16px; right: 16px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 1;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .memory-card .body {
+    padding: 22px 24px 26px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .memory-card .date {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+  .memory-card h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 28px;
+    line-height: 1.1;
+    margin: 4px 0 0;
+    color: var(--ink);
+  }
+  .memory-card h3 .it { font-style: italic; }
+  .memory-card .sub {
+    font-size: 14px;
+    color: var(--ink-2);
+    margin-top: 4px;
+  }
+  .memory-card .foot {
+    margin-top: 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .memory-card:hover .foot .arrow { transform: translateX(4px); }
+  .memory-card .foot .arrow { transition: transform 240ms ease; }
+  @media (max-width: 768px) {
+    .memory-card { grid-column: span 12; }
+  }
+
+  .memories-empty {
+    text-align: center;
+    padding: 80px 24px;
+    background: var(--bg-2);
+    border-radius: 8px;
+    margin-top: 24px;
+  }
+  .memories-empty .icon { font-size: 32px; margin-bottom: 12px; }
+  .memories-empty h3 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-style: italic;
+    font-size: 26px;
+    color: var(--ink);
+    margin: 0 0 8px;
+  }
+  .memories-empty p { color: var(--ink-2); max-width: 440px; margin: 0 auto; font-size: 14px; }
+
+  /* Gallery */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 36px;
+  }
+  .gallery-photo {
+    aspect-ratio: 1/1;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    cursor: zoom-in;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+    position: relative;
+  }
+  .gallery-photo:hover { transform: scale(1.015); box-shadow: 0 12px 28px rgba(0,0,0,0.12); }
+  .gallery-photo.is-video::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.18);
+    border-radius: inherit;
+    pointer-events: none;
+    transition: background 200ms ease;
+  }
+  .gallery-photo.is-video:hover::before { background: rgba(0,0,0,0.32); }
+  .gallery-photo.is-video::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 54px; height: 54px;
+    margin: -27px 0 0 -27px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.92) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%230a0a0a"><path d="M8 5v14l11-7z"/></svg>') center/22px no-repeat;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    pointer-events: none;
+    transition: transform 200ms ease;
+  }
+  .gallery-photo.is-video:hover::after { transform: scale(1.08); }
+  .gallery-photo.is-video .vid-tag {
+    position: absolute;
+    bottom: 8px; left: 8px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; font-weight: 700;
+    padding: 4px 8px; border-radius: 4px;
+    pointer-events: none;
+  }
+  @media (max-width: 768px) {
+    .gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0;
+    background: rgba(8, 8, 12, 0.94);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    animation: fadeIn 200ms ease;
+  }
+  .lightbox.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .lightbox .lb-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 28px;
+    color: rgba(255,255,255,0.88);
+  }
+  .lightbox .lb-top .meta { font-size: 13px; }
+  .lightbox .lb-top .meta b {
+    font-family: var(--serif); font-style: italic; font-size: 18px; font-weight: 500;
+    color: #fff; margin-right: 12px;
+  }
+  .lightbox .lb-close {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 0; cursor: pointer;
+    transition: background 160ms ease;
+  }
+  .lightbox .lb-close:hover { background: rgba(255,255,255,0.2); }
+  .lightbox .lb-close svg { width: 18px; height: 18px; }
+  .lightbox .lb-stage {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 24px;
+    overflow: hidden;
+  }
+  .lightbox .lb-stage img {
+    max-height: 100%; max-width: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+  .lightbox .lb-stage iframe {
+    width: min(92vw, 720px);
+    height: min(78vh, 1066px);
+    border: 0;
+    border-radius: 4px;
+    background: #000;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+  .lightbox .lb-actions {
+    display: flex; gap: 12px; justify-content: center;
+    padding: 22px 24px 28px;
+  }
+  .lightbox .lb-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px;
+    padding: 11px 22px;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    transition: background 160ms ease, border-color 160ms ease;
+  }
+  .lightbox .lb-btn:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
+  .lightbox .lb-btn.primary { background: #fff; color: var(--ink); border-color: #fff; }
+  .lightbox .lb-btn.primary:hover { background: rgba(255,255,255,0.88); }
+  .lightbox .lb-btn svg { width: 16px; height: 16px; }
+
+  /* Story preview modal */
+  .story-modal {
+    position: fixed; inset: 0;
+    background: rgba(8, 8, 12, 0.96);
+    z-index: 1100;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 28px;
+    animation: fadeIn 220ms ease;
+  }
+  .story-modal.active { display: flex; }
+  .story-modal .panel {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 28px;
+    max-width: 460px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+  }
+  .story-modal .stamp {
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ink-2); font-weight: 700;
+  }
+  .story-modal h3 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: 28px; line-height: 1.1; margin: 8px 0 4px;
+    color: var(--ink);
+  }
+  .story-modal h3 .it { font-style: italic; }
+  .story-modal p { font-size: 13px; color: var(--ink-2); margin: 0 0 18px; }
+  .story-modal .story-canvas-wrap {
+    background: var(--bg-3);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 18px;
+    aspect-ratio: 9/16;
+    max-height: 60vh;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .story-modal canvas {
+    max-width: 100%; max-height: 100%;
+    border-radius: 4px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+  }
+  .story-modal .story-actions { display: flex; gap: 10px; justify-content: center; }
+  .story-modal .sm-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    border-radius: 999px;
+    padding: 11px 22px;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--rule);
+    background: var(--bg); color: var(--ink);
+    transition: border-color 160ms ease, background 160ms ease;
+  }
+  .story-modal .sm-btn:hover { border-color: var(--ink); }
+  .story-modal .sm-btn.primary { background: var(--ink); color: var(--ink-on); border-color: var(--ink); }
+  .story-modal .sm-btn.primary:hover { background: #1c1c1c; }
+  .story-modal .sm-btn svg { width: 16px; height: 16px; }
+  .story-modal .sm-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--bg-3); color: var(--ink);
+    border: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .story-modal .sm-close:hover { background: var(--rule); }
+  .story-modal .sm-spinner {
+    width: 32px; height: 32px; border: 3px solid var(--rule); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin 700ms linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Memory detail hero */
+  .memory-hero {
+    position: relative;
+    height: 360px;
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .memory-hero .bg {
+    position: absolute; inset: 0; z-index: -2;
+    background-size: cover; background-position: center;
+    filter: blur(2px) brightness(0.7);
+    transform: scale(1.05);
+  }
+  .memory-hero .scrim {
+    position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.55) 100%);
+  }
+  .memory-hero .container {
+    height: 100%;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding-bottom: 40px;
+  }
+  .memory-hero .eyebrow {
+    font-family: var(--sans);
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(255,255,255,0.78); font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .memory-hero h1 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: 64px; line-height: 1; letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .memory-hero h1 .it { font-style: italic; }
+  .memory-hero .sub {
+    margin-top: 14px;
+    font-size: 15px; font-weight: 400;
+    color: rgba(255,255,255,0.85);
+  }
+  @media (max-width: 768px) {
+    .memory-hero { height: 280px; }
+    .memory-hero h1 { font-size: 44px; }
+  }
+
+  /* Agenda hub → Memories teaser */
+  .memories-teaser {
+    margin-top: 28px;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 28px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px;
+    cursor: pointer;
+    transition: border-color 160ms ease, background 160ms ease;
+    text-align: left;
+    width: 100%;
+    background: var(--bg);
+  }
+  .memories-teaser:hover { border-color: var(--ink); background: var(--bg-2); }
+  .memories-teaser .text .stamp {
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--accent-2); font-weight: 700;
+  }
+  .memories-teaser .text h3 {
+    font-family: var(--serif); font-weight: 500; font-style: italic;
+    font-size: 26px; margin: 6px 0 4px; color: var(--ink);
+  }
+  .memories-teaser .text p { font-size: 14px; color: var(--ink-2); margin: 0; }
+  .memories-teaser .arrow {
+    font-size: 28px; color: var(--accent); flex-shrink: 0;
+    transition: transform 240ms ease;
+  }
+  .memories-teaser:hover .arrow { transform: translateX(6px); }
+
+  /* ================================================================
+     SOUVENIR BAND (song + sticker in memory detail)
+     ================================================================ */
+  .souvenir { padding-top: 40px; padding-bottom: 0; }
+  .souvenir .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+  .souvenir-card {
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+  .souvenir-card .stamp {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--accent-2);
+  }
+  .souvenir-card h4 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.2;
+    margin: 6px 0 14px;
+    color: var(--ink);
+  }
+  .souvenir-song .spotify-embed {
+    width: 100%;
+    min-height: 152px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--bg-3);
+    display: block;
+  }
+  .souvenir-song .empty {
+    background: var(--bg-2);
+    border: 1px dashed var(--rule);
+    border-radius: 10px;
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--ink-2);
+    font-size: 13px;
+    line-height: 1.5;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .souvenir-song .empty .icon { font-size: 26px; margin-bottom: 8px; }
+  .souvenir-song .empty .hint {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 700;
+    margin-top: 8px;
+  }
+  .souvenir-sticker .preview {
+    background: linear-gradient(135deg, #f7f3eb 0%, #e9e1d3 100%);
+    border-radius: 10px;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    min-height: 280px;
+  }
+  .souvenir-sticker canvas {
+    max-width: 100%;
+    max-height: 360px;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.16));
+  }
+  .souvenir-sticker .actions { display: flex; gap: 10px; margin-top: 14px; }
+  .souvenir-sticker .stk-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    border-radius: 999px;
+    padding: 11px 22px;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--rule);
+    background: var(--bg); color: var(--ink);
+    transition: border-color 160ms ease, background 160ms ease;
+  }
+  .souvenir-sticker .stk-btn:hover { border-color: var(--ink); }
+  .souvenir-sticker .stk-btn.primary { background: var(--ink); color: var(--ink-on); border-color: var(--ink); }
+  .souvenir-sticker .stk-btn.primary:hover { background: #1c1c1c; }
+  .souvenir-sticker .stk-btn svg { width: 16px; height: 16px; }
+  .souvenir-sticker .stk-btn.copied { background: var(--ok); border-color: var(--ok); color: var(--ink-on); }
+  @media (max-width: 768px) {
+    .souvenir .grid { grid-template-columns: 1fr; }
+  }
+
+  /* ================================================================
+     BUTTONS
+     ================================================================ */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 15px 32px;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    transition: all 180ms ease;
+    cursor: pointer;
+  }
+  .btn.primary {
+    background: var(--accent);
+    color: white;
+  }
+  .btn.primary:hover { background: var(--accent-2); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+  }
+  .btn.secondary:hover { background: var(--accent-soft); }
+  .btn.ghost {
+    background: transparent; color: var(--ink); border: 1px solid var(--rule);
+  }
+  .btn.ghost:hover { border-color: var(--ink); }
+  .btn .arrow { width: 16px; height: 16px; }
+
+  /* ================================================================
+     FACT GRID
+     ================================================================ */
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 56px;
+    border-top: 1px solid var(--rule);
+  }
+  .facts .fact {
+    border-bottom: 1px solid var(--rule);
+    padding: 28px 24px 28px 0;
+    border-right: 1px solid var(--rule);
+  }
+  .facts .fact:last-child { border-right: none; padding-right: 0; }
+  .facts .lbl {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .facts .val {
+    font-family: var(--serif);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+  .facts .val .it { font-style: italic; }
+  .facts .val .sm { font-size: 18px; color: var(--ink-2); margin-left: 6px; font-style: italic;}
+
+  /* ================================================================
+     STEP INDICATOR (Mercedes-style)
+     ================================================================ */
+  .steps {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 32px;
+  }
+  .steps .step {
+    display: flex; align-items: center; gap: 14px;
+    color: var(--ink-3);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .steps .step .num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-3);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .steps .step.done .num {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: white;
+  }
+  .steps .step.done .num::after { content: "✓"; }
+  .steps .step.done .num > span { display: none; }
+  .steps .step.current .num {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .steps .step.current { color: var(--ink); }
+  .steps .line {
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+    margin: 0 16px;
+  }
+
+  /* ================================================================
+     DAY DETAIL — TIMELINE
+     ================================================================ */
+  .timeline {
+    border-top: 1px solid var(--rule);
+  }
+  .tl-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    column-gap: 32px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .tl-row .time {
+    font-size: 13px;
+    color: var(--ink-2);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding-top: 2px;
+  }
+  .tl-row .what { font-size: 17px; color: var(--ink); line-height: 1.5; }
+  .tl-row .what b { font-weight: 600; }
+  .tl-row .what em { font-style: italic; color: var(--ink-2); }
+  .tl-row.head {
+    background: var(--bg-2);
+    padding: 14px 16px;
+    margin: 4px -16px 0;
+    border-radius: 4px;
+    grid-template-columns: 1fr auto;
+    border: none;
+  }
+  .tl-row.head .time { font-family: var(--serif); font-style: italic; color: var(--ink); font-size: 17px; padding-top: 0; }
+  .tl-row.head .what { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: var(--ink-2); text-align: right; padding-top: 4px;}
+  .tl-row.warn .time { color: var(--warning); }
+  .tl-row.warn .what::before {
+    content: "!"; display: inline-block;
+    width: 18px; height: 18px;
+    background: var(--warning); color: white;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 12px; font-weight: 700; line-height: 18px;
+    margin-right: 8px;
+    vertical-align: 1px;
+  }
+
+  /* ================================================================
+     MOMENT CARDS (within day detail)
+     ================================================================ */
+  .moments {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+  }
+  .moment {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 200ms ease;
+  }
+  .moment:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+  }
+  .moment .photo {
+    aspect-ratio: 16/9;
+    position: relative;
+  }
+  .moment .photo .tag {
+    position: absolute; top: 14px; left: 14px;
+    background: rgba(255,255,255,0.95);
+    color: var(--ink);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border-radius: 3px;
+  }
+  .moment .body { padding: 22px 24px 24px; }
+  .moment .when {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .moment h4 {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.1;
+    margin: 6px 0 8px;
+  }
+  .moment .desc { color: var(--ink-2); font-size: 14px; line-height: 1.5; }
+  .moment .foot {
+    margin-top: 14px;
+    display: flex; align-items: center; gap: 8px;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* ================================================================
+     VOTE CARD
+     ================================================================ */
+  .vote {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 28px 32px;
+    background: var(--bg);
+  }
+  .vote-head {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 8px;
+  }
+  .vote-head .stamp { color: var(--accent); }
+  .vote h3 {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.15;
+    margin: 6px 0 6px;
+  }
+  .vote .sub { color: var(--ink-2); font-size: 14px; margin-bottom: 18px; }
+  .vote ul { list-style: none; padding: 0; margin: 0; }
+  .vote li {
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 16px;
+    align-items: start;
+    padding: 14px 4px;
+    border-top: 1px solid var(--rule);
+    cursor: pointer;
+    user-select: none;
+  }
+  .vote li:hover { background: var(--bg-2); margin: 0 -8px; padding-left: 12px; padding-right: 12px; border-radius: 4px; }
+  .vote li:hover + li { border-top-color: transparent; }
+  .vote li:first-of-type { border-top: 1px solid var(--ink); }
+  .vote li .radio {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-3);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-top: 2px;
+    flex-shrink: 0;
+    transition: all 140ms ease;
+  }
+  .vote li .radio::after {
+    content: ""; width: 12px; height: 12px;
+    background: var(--accent); border-radius: 50%;
+    transform: scale(0);
+    transition: transform 180ms cubic-bezier(0.5,1.6,0.4,1);
+  }
+  .vote li[aria-checked="true"] .radio { border-color: var(--accent); }
+  .vote li[aria-checked="true"] .radio::after { transform: scale(1); }
+  .vote li .label { font-size: 16px; color: var(--ink); font-weight: 500; line-height: 1.4; }
+  .vote li .label .note { display: block; font-size: 13px; color: var(--ink-2); font-weight: 400; margin-top: 3px; }
+  .vote li .badge {
+    align-self: center;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+  .vote li[data-default] .badge { color: var(--accent); border-color: var(--accent); }
+  .vote li[aria-checked="true"] .badge { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* ================================================================
+     CARD STAT BLOCK (cards page)
+     ================================================================ */
+  .card-detail {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .card-block {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 36px 36px 32px;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+  .card-block .num {
+    position: absolute; top: 24px; right: 32px;
+    font-family: var(--serif);
+    font-size: 88px;
+    line-height: 0.85;
+    color: var(--bg-3);
+    font-style: italic;
+    font-weight: 400;
+  }
+  .card-block .where {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-block h3 {
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 500;
+    line-height: 1.05;
+    margin: 8px 0 12px;
+    max-width: 80%;
+  }
+  .card-block .desc { color: var(--ink-2); font-size: 15px; line-height: 1.55; }
+  .card-block .stats {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    display: flex; gap: 28px;
+    font-size: 12px;
+    color: var(--ink-2);
+    letter-spacing: 0.04em;
+  }
+  .card-block .stats b { color: var(--ink); font-weight: 600; }
+
+  /* ================================================================
+     PRIMARY ACTION BAR (sticky bottom)
+     ================================================================ */
+  .actionbar {
+    border-top: 1px solid var(--rule);
+    background: var(--bg);
+    padding: 24px 0;
+    margin-top: 56px;
+  }
+  .actionbar .container {
+    display: flex; justify-content: space-between; align-items: center; gap: 24px;
+  }
+  .actionbar .left .lbl {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+  .actionbar .left .val {
+    font-family: var(--serif);
+    font-size: 22px;
+    margin-top: 4px;
+  }
+
+  /* ================================================================
+     PHOTO STRIP (4 small)
+     ================================================================ */
+  .photo-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 56px 0 0;
+  }
+  .photo-strip .ps {
+    aspect-ratio: 3/4;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .photo-strip .ps .cap {
+    position: absolute; left: 16px; bottom: 14px;
+    color: white;
+    font-family: var(--serif);
+    font-size: 20px;
+    font-style: italic;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+
+  /* ================================================================
+     MAP
+     ================================================================ */
+  .map {
+    position: relative;
+    aspect-ratio: 16/9;
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 1px, transparent 1px 48px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0 1px, transparent 1px 48px),
+      radial-gradient(60% 50% at 50% 50%, #faf6ef, #efe7d8);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 40px;
+  }
+  .map .pin {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    display: flex; flex-direction: column; align-items: center;
+    pointer-events: none;
+  }
+  .map .pin .dot {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 6px rgba(0,173,239,0.15);
+    margin-bottom: 6px;
+  }
+  .map .pin.home .dot { background: var(--ink); box-shadow: 0 0 0 8px rgba(0,0,0,0.1); width: 18px; height: 18px;}
+  .map .pin .lbl {
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    background: white;
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .map .pin.home .lbl {
+    background: var(--ink); color: white; border-color: var(--ink);
+    font-family: var(--serif); text-transform: none; font-style: italic;
+    font-size: 14px; padding: 5px 12px; letter-spacing: 0;
+  }
+  .map svg.legs { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* ================================================================
+     FOOTER
+     ================================================================ */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 48px 0 64px;
+    background: var(--bg);
+  }
+  footer .container {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  footer .mark {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-style: italic;
+  }
+  footer .nav { display: flex; gap: 32px; }
+  footer .nav a { font-size: 13px; color: var(--ink-2); }
+  footer .nav a:hover { color: var(--ink); }
+
+  /* ================================================================
+     UTILITIES
+     ================================================================ */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .grid-12 { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
+  .col-7 { grid-column: span 7; }
+  .col-5 { grid-column: span 5; }
+  .col-8 { grid-column: span 8; }
+  .col-4 { grid-column: span 4; }
+  .col-6 { grid-column: span 6; }
+  .col-12 { grid-column: span 12; }
+  .pad-top-l { margin-top: 64px; }
+  .pad-top-m { margin-top: 40px; }
+  .pad-top-s { margin-top: 24px; }
+  .accent { color: var(--accent); }
+  .text-ink-2 { color: var(--ink-2); }
+
+  /* Subtle film grain over hero */
+  .hero .grain {
+    position: absolute; inset: 0; pointer-events: none;
+    opacity: 0.18;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  /* ================================================================
+     ADD TO CALENDAR
+     ================================================================ */
+  .cal-add {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+  }
+  .cal-add__btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 13px 22px 13px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: white;
+    transition: background 160ms ease;
+  }
+  .cal-add__btn:hover { background: #1f1f1f; }
+  .cal-add__btn .cal-ico {
+    width: 16px; height: 16px;
+  }
+  .cal-add__btn .cal-caret {
+    width: 12px; height: 12px;
+    margin-left: 2px;
+    transition: transform 200ms ease;
+  }
+  .cal-add[data-open="true"] .cal-add__btn .cal-caret { transform: rotate(180deg); }
+  .cal-add__menu {
+    position: absolute;
+    top: calc(100% + 8px); left: 0;
+    min-width: 240px;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    box-shadow: 0 16px 40px -12px rgba(0,0,0,0.18);
+    padding: 6px;
+    z-index: 30;
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+  .cal-add[data-open="true"] .cal-add__menu {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .cal-add__menu button {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 4px;
+    text-align: left;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 120ms ease;
+  }
+  .cal-add__menu button:hover { background: var(--bg-2); }
+  .cal-add__menu button .sub {
+    display: block;
+    font-size: 11px;
+    color: var(--ink-2);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+  }
+  .cal-add__menu .opt-ico {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+    color: var(--ink-2);
+  }
+  .cal-add__toast {
+    position: absolute;
+    top: calc(100% + 10px); left: 0;
+    background: var(--ink);
+    color: white;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 3px;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition: opacity 200ms ease, transform 200ms ease;
+    white-space: nowrap;
+  }
+  .cal-add__toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .cal-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  /* ================================================================
+     RESPONSIVE
+     ================================================================ */
+  @media (max-width: 960px) {
+    .hero h1 { font-size: 56px; }
+    .display { font-size: 44px; }
+    .display.sm { font-size: 32px; }
+    .events .event-card, .events .event-card.feat { grid-column: span 12; }
+    .grid-2 { grid-template-columns: 1fr; gap: 40px; }
+    .col-7, .col-5, .col-8, .col-4, .col-6 { grid-column: span 12; }
+    .facts { grid-template-columns: repeat(2, 1fr); }
+    .moments, .card-detail { grid-template-columns: 1fr; }
+    .subscribe .grid { grid-template-columns: 1fr; gap: 32px; }
+    .subscribe .ctas { flex-wrap: wrap; }
+  }
+
+  /* ================================================================
+     SUBSCRIBE BLOCK
+     ================================================================ */
+  .subscribe { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .subscribe .grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .subscribe .lede .stamp { color: var(--accent-2); }
+  .subscribe .lede h2 { margin-top: 14px; }
+  .subscribe .lede p { margin-top: 22px; }
+  .subscribe .lede p + p { margin-top: 14px; }
+  .subscribe .signoff {
+    margin-top: 26px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ink-2);
+  }
+  .subscribe .panel {
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 32px;
+  }
+  .subscribe .panel .label {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-3);
+  }
+  .subscribe .panel h3 {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.15;
+    margin: 10px 0 6px;
+    color: var(--ink);
+  }
+  .subscribe .panel h3 .it { font-style: italic; }
+  .subscribe .panel .hint { font-size: 13px; color: var(--ink-2); margin: 0 0 22px; }
+  .subscribe .ctas { display: flex; flex-direction: column; gap: 10px; }
+  .subscribe .cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--rule);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--bg);
+    transition: border-color 160ms ease, transform 160ms ease, background 160ms ease;
+    cursor: pointer;
+    text-align: left;
+  }
+  .subscribe .cta:hover { border-color: var(--ink); transform: translateY(-1px); }
+  .subscribe .cta.primary { background: var(--ink); color: var(--ink-on); border-color: var(--ink); }
+  .subscribe .cta.primary:hover { background: #1c1c1c; }
+  .subscribe .cta .who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .subscribe .cta .who svg { width: 18px; height: 18px; flex: 0 0 auto; }
+  .subscribe .cta .arrow { font-size: 13px; color: var(--ink-3); }
+  .subscribe .cta.primary .arrow { color: rgba(255,255,255,0.7); }
+  .subscribe .cta.copied { border-color: var(--ok); color: var(--ok); }
+  .subscribe .footnote { margin-top: 20px; font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- ========================== TOPBAR ========================== -->
+<header class="topbar">
+  <div class="left">
+    <button class="back" data-back aria-label="Back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="crumb" id="crumb">THE AGENDA</div>
+  </div>
+  <div class="brand">The Group Chat<span class="amp">:</span> <span style="font-style:italic">IRL</span></div>
+  <div class="right">
+    <button class="icon-btn" aria-label="Search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    </button>
+    <button class="icon-btn" aria-label="Bookmark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    </button>
+    <a class="invite" href="https://calendar.google.com/calendar/u/0?cid=MzE3OTMwOWZkMTJiMjgyNDY1YjUxYzI1NWEwMTUyODFmOTU2OTM4Njc2MDhjMTFkZWQ4NTMxZDk2MWZkMDk5ZEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t" target="_blank" rel="noopener">Subscribe</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================================================
+     VIEW · SUMMER HUB
+     ============================================================ -->
+<section class="view" data-view="summer">
+  <div class="hero short">
+    <div class="bg photo-summer"></div>
+    <div class="scrim"></div>
+    <div class="grain"></div>
+    <div class="container">
+      <div class="eyebrow">Locked-in · 11 events</div>
+      <h1>The<br/><span class="it">agenda.</span></h1>
+      <p class="sub">A working calendar of what we've actually committed to. Click any event to dig in — the long ones have their own pages.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SUBSCRIBE
+       ============================================================ -->
+  <section class="block bg subscribe" id="subscribe">
+    <div class="container">
+      <div class="grid">
+
+        <div class="lede">
+          <div class="stamp">The Calendar · Subscribe</div>
+          <h2 class="display">The Group Chat<span class="it">: IRL</span> ✨</h2>
+          <p class="body-lg">The agenda, fully assembled. Gaby and I did the planning so you don't have to — every adventure, hang, day trip, and questionable idea we've committed to is on here.</p>
+          <p class="body-md">Subscribe once and every event shows up on your own calendar automatically. See something you want in on? <em>Just show up.</em> No RSVP gymnastics required. Plans may shift — the calendar is the source of truth, so check back before you head out.</p>
+          <p class="body-md">No pressure to make everything. Come to one thing, come to all of them. The group chat finally has a calendar.</p>
+          <div class="signoff">— xo, Jess &amp; Gaby</div>
+        </div>
+
+        <div class="panel">
+          <div class="label">Add to your calendar</div>
+          <h3>One tap. <span class="it">Done.</span></h3>
+          <p class="hint">Pick your flavor. New events auto-sync — you'll never have to ask "wait, when is that thing?" again.</p>
+
+          <div class="ctas">
+            <a class="cta primary" href="https://calendar.google.com/calendar/u/0?cid=MzE3OTMwOWZkMTJiMjgyNDY1YjUxYzI1NWEwMTUyODFmOTU2OTM4Njc2MDhjMTFkZWQ4NTMxZDk2MWZkMDk5ZEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t" target="_blank" rel="noopener">
+              <span class="who">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                Add to Google Calendar
+              </span>
+              <span class="arrow">→</span>
+            </a>
+
+            <a class="cta" href="webcal://calendar.google.com/calendar/ical/3179309fd12b282465b51c255a015281f95693867608c11ded8531d961fd099d%40group.calendar.google.com/public/basic.ics">
+              <span class="who">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>
+                Add to Apple Calendar
+              </span>
+              <span class="arrow">→</span>
+            </a>
+
+            <button class="cta" id="copyIcsBtn" data-ics="https://calendar.google.com/calendar/ical/3179309fd12b282465b51c255a015281f95693867608c11ded8531d961fd099d%40group.calendar.google.com/public/basic.ics">
+              <span class="who">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span id="copyIcsLabel">Copy .ics link (Outlook, anything else)</span>
+              </span>
+              <span class="arrow">⧉</span>
+            </button>
+          </div>
+
+          <p class="footnote">Heads up: Google Calendar can take up to 12 hours to surface brand-new events to subscribers. If something's missing, it's coming.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="container">
+      <div class="events">
+
+        <div class="event-card" data-go="pride">
+          <div class="photo photo-misc-pride"><span class="label next">Up next · Jun 7</span></div>
+          <div class="body">
+            <div class="date">Sunday · June 7 · 12 PM</div>
+            <h3>Utah Pride Festival 🌈✨</h3>
+            <div class="desc">Washington Square Park, downtown SLC. The festival weekend energy we wait all year for. Tickets needed for entry.</div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-k">Cost</span><span>~$25 / person (festival pass)</span></div>
+              <div class="meta-row"><span class="meta-k">Where</span><span><a href="https://www.google.com/maps/dir/?api=1&amp;destination=451+S+State+St%2C+Salt+Lake+City%2C+UT+84111" target="_blank" rel="noopener" onclick="event.stopPropagation()">Google Maps</a><span class="sep">·</span><a href="https://maps.apple.com/?daddr=451+S+State+St%2C+Salt+Lake+City%2C+UT+84111" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apple Maps</a></span></div>
+            </div>
+            <div class="foot"><span>Details</span><span class="arrow">→</span></div>
+            <a class="tix" href="https://utahpride.org/tickets" target="_blank" rel="noopener" onclick="event.stopPropagation()">Pride tickets →</a>
+          </div>
+        </div>
+
+        <div class="event-card" data-go="stars">
+          <div class="photo photo-misc-stars"><span class="label">Jun 10</span></div>
+          <div class="body">
+            <div class="date">Wednesday · June 10 · 9 PM</div>
+            <h3>Star Party ✨</h3>
+            <div class="desc">Willard Eccles Observatory at the U. Free, walk-up. Bring layers — the dome runs cold.</div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-k">Cost</span><span>Free · just show up</span></div>
+              <div class="meta-row"><span class="meta-k">Where</span><span><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Willard+Eccles+Observatory%2C+270+S+1400+E%2C+Salt+Lake+City%2C+UT+84112" target="_blank" rel="noopener" onclick="event.stopPropagation()">Google Maps</a><span class="sep">·</span><a href="https://maps.apple.com/?daddr=Willard+Eccles+Observatory%2C+270+S+1400+E%2C+Salt+Lake+City%2C+UT+84112" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apple Maps</a></span></div>
+            </div>
+            <div class="foot"><span>Details</span><span class="arrow">→</span></div>
+          </div>
+        </div>
+
+        <div class="event-card" data-go="race">
+          <div class="photo photo-misc-race"><span class="label">Jun 12</span></div>
+          <div class="body">
+            <div class="date">Friday · June 12 · 5:30 PM</div>
+            <h3>Desert Thunder + Dinner 🌩️🏎️</h3>
+            <div class="desc">Drive down to Price, dinner first, then the raceway. Ear protection: required.</div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-k">Cost</span><span>~$30–40 / person</span></div>
+              <div class="meta-row"><span class="meta-k">Where</span><span><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Desert+Thunder+Raceway%2C+2800+Airport+Rd%2C+Price%2C+UT+84501" target="_blank" rel="noopener" onclick="event.stopPropagation()">Google Maps</a><span class="sep">·</span><a href="https://maps.apple.com/?daddr=Desert+Thunder+Raceway%2C+2800+Airport+Rd%2C+Price%2C+UT+84501" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apple Maps</a></span></div>
+            </div>
+            <div class="foot"><span>Details</span><span class="arrow">→</span></div>
+            <a class="tix" href="https://www.desertthunderraceway.com/tickets" target="_blank" rel="noopener" onclick="event.stopPropagation()">Tickets at gate · info →</a>
+          </div>
+        </div>
+
+        <div class="event-card" data-go="brunch">
+          <div class="photo photo-misc-brunch"><span class="label">Jun 13</span></div>
+          <div class="body">
+            <div class="date">Saturday · June 13 · 9:30 AM</div>
+            <h3>Butterflies + Brunch 🦋🥂</h3>
+            <div class="desc">Brunch at Aubergine in Lehi, then the Butterfly Biosphere at Thanksgiving Point. Also celebrating Ivanna — she booked her first role.</div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-k">Cost</span><span>~$45–55 / person (brunch + biosphere)</span></div>
+              <div class="meta-row"><span class="meta-k">Where</span><span><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Aubergine+Kitchen%2C+3430+N+Ashton+Blvd%2C+Lehi%2C+UT+84043" target="_blank" rel="noopener" onclick="event.stopPropagation()">Google Maps</a><span class="sep">·</span><a href="https://maps.apple.com/?daddr=Aubergine+Kitchen%2C+3430+N+Ashton+Blvd%2C+Lehi%2C+UT+84043" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apple Maps</a></span></div>
+            </div>
+            <div class="foot"><span>Details</span><span class="arrow">→</span></div>
+            <a class="tix" href="https://thanksgivingpoint.org/visit/tickets/" target="_blank" rel="noopener" onclick="event.stopPropagation()">Biosphere tickets →</a>
+          </div>
+        </div>
+
+        <div class="event-card" data-go="bees">
+          <div class="photo photo-misc-bees"><span class="label">Jun 16</span></div>
+          <div class="body">
+            <div class="date">Tuesday · June 16 · 6:30 PM</div>
+            <h3>Bees Game 🐝⚾️</h3>
+            <div class="desc">Daybreak Ballpark, South Jordan. Bring a sweatshirt — those evening games get breezy.</div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-k">Cost</span><span>~$15–25 / person</span></div>
+              <div class="meta-row"><span class="meta-k">Where</span><span><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Salt+Lake+Bees+Daybreak+Ballpark%2C+11111+South+Ballpark+Way%2C+South+Jordan%2C+UT+84009" target="_blank" rel="noopener" onclick="event.stopPropagation()">Google Maps</a><span class="sep">·</span><a href="https://maps.apple.com/?daddr=Salt+Lake+Bees+Daybreak+Ballpark%2C+11111+South+Ballpark+Way%2C+South+Jordan%2C+UT+84009" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apple Maps</a></span></div>
+            </div>
+            <div class="foot"><span>Details</span><span class="arrow">→</span></div>
+            <a class="tix" href="https://www.milb.com/salt-lake/tickets" target="_blank" rel="noopener" onclick="event.stopPropagation()">Bees tickets →</a>
+          </div>
+        </div>
+
+        <div class="event-card" data-go="craft">
+          <div class="photo photo-misc-craft"><span class="label">Jun 28</span></div>
+          <div class="body">
+            <div class="date">Sunday · June 28 · 6 PM</div>
+            <h3>Sunday Craft Night + Movie 🧿🎥</h3>
+            <div class="desc">Keychains and charms at Kate's, then a movie. BYO snack rotation continues. Movie + craft: TBD.</div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-k">Cost</span><span>~$10–20 / person (BYO snacks + craft supplies)</span></div>
+              <div class="meta-row"><span class="meta-k">Where</span><span>Kate's place — address TBD in group chat</span></div>
+            </div>
+            <div class="foot"><span>Details</span><span class="arrow">→</span></div>
+          </div>
+        </div>
+
+        <div class="event-card" data-go="concert">
+          <div class="photo photo-misc-concert"><span class="label">Jul 17</span></div>
+          <div class="body">
+            <div class="date">Friday · July 17 · 6:30 PM</div>
+            <h3>Hilary Duff Concert 🎶🦋</h3>
+            <div class="desc">Utah First Credit Union Amphitheatre, West Valley. The reunion-tour energy we deserve. Carpool from SLC.</div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-k">Cost</span><span>~$50–150 / person (lawn vs reserved)</span></div>
+              <div class="meta-row"><span class="meta-k">Where</span><span><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Utah+First+Credit+Union+Amphitheatre%2C+5150+Upper+Ridge+Rd%2C+West+Valley+City%2C+UT+84118" target="_blank" rel="noopener" onclick="event.stopPropagation()">Google Maps</a><span class="sep">·</span><a href="https://maps.apple.com/?daddr=Utah+First+Credit+Union+Amphitheatre%2C+5150+Upper+Ridge+Rd%2C+West+Valley+City%2C+UT+84118" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apple Maps</a></span></div>
+            </div>
+            <div class="foot"><span>Details</span><span class="arrow">→</span></div>
+          </div>
+        </div>
+
+        <div class="event-card" data-go="rodeo">
+          <div class="photo photo-misc-rodeo"><span class="label">Jul 24</span></div>
+          <div class="body">
+            <div class="date">Friday · July 24 · 8 PM</div>
+            <h3>Days of '47 Rodeo 🐎🇺🇸🎆</h3>
+            <div class="desc">Utah's flagship rodeo — Days of '47 Arena, Salt Lake. Cowboy hat optional, sunset finale not.</div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-k">Cost</span><span>~$25–60 / person</span></div>
+              <div class="meta-row"><span class="meta-k">Where</span><span><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Days+of+47+Arena%2C+155+N+1000+W%2C+Salt+Lake+City%2C+UT+84116" target="_blank" rel="noopener" onclick="event.stopPropagation()">Google Maps</a><span class="sep">·</span><a href="https://maps.apple.com/?daddr=Days+of+47+Arena%2C+155+N+1000+W%2C+Salt+Lake+City%2C+UT+84116" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apple Maps</a></span></div>
+            </div>
+            <div class="foot"><span>Details</span><span class="arrow">→</span></div>
+            <a class="tix" href="https://www.daysof47.com/rodeo" target="_blank" rel="noopener" onclick="event.stopPropagation()">Rodeo tickets →</a>
+          </div>
+        </div>
+
+        <div class="event-card" data-go="coast">
+          <div class="photo photo-misc-coast"><span class="label">Aug 5–9</span></div>
+          <div class="body">
+            <div class="date">Wednesday → Saturday · August 5–9</div>
+            <h3>Oregon Coast Roadtrip 🌊🚐</h3>
+            <div class="desc">PNW reset. Cannon Beach, tidepools, foggy mornings, fleeces in August. Trip details to come.</div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-k">Cost</span><span>TBD · ~$400+ / person (rough estimate)</span></div>
+              <div class="meta-row"><span class="meta-k">Where</span><span>Oregon Coast — multi-stop, route TBD</span></div>
+            </div>
+            <div class="foot"><span>Details</span><span class="arrow">→</span></div>
+          </div>
+        </div>
+
+        <div class="event-card feat" data-go="zion">
+          <div class="photo photo-zion-canyon"><span class="label">Labor Day · Sep 4–7</span></div>
+          <div class="body">
+            <div class="date">Friday → Monday · September 4–7</div>
+            <h3>Labor Day Zion Weekend ☀️🌭🕶️</h3>
+            <div class="desc">Long-weekend escape to St. George + Zion. Four days, four activity cards, one private-pool Airbnb. Originally planned for June; moved to Labor Day so we can take advantage of the extra day. Tap for the full trip page — daily itineraries, votes, bookings.</div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-k">Cost</span><span>~$500 / person (lodging, food, gas, park entry)</span></div>
+              <div class="meta-row"><span class="meta-k">Where</span><span>Multi-stop — see trip page</span></div>
+            </div>
+            <div class="foot"><span>Open trip page</span><span class="arrow">→</span></div>
+          </div>
+        </div>
+
+        <div class="event-card" data-go="vietnam">
+          <div class="photo photo-misc-vietnam"><span class="label">Sep 25 – Oct 8</span></div>
+          <div class="body">
+            <div class="date">Friday → Thursday · Sept 25 → Oct 8</div>
+            <h3>Vietnam ✈️🌿</h3>
+            <div class="desc">Two weeks across Vietnam. Itinerary TBD — likely Hanoi, Hoi An, Ho Chi Minh, with a beach stretch in between. The "we've been saying we'd do this for years" trip.</div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-k">Cost</span><span>TBD · ~$2,500–4,000 / person (flights + lodging + food)</span></div>
+              <div class="meta-row"><span class="meta-k">Where</span><span>Vietnam — multi-stop, itinerary TBD</span></div>
+            </div>
+            <div class="foot"><span>Details</span><span class="arrow">→</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <button class="memories-teaser" data-go="memories">
+        <div class="text">
+          <div class="stamp">Memories</div>
+          <h3>Look back at the ones we've already done.</h3>
+          <p>Photo galleries from past hangs — save the originals, or grab an Instagram-Story-ready version in one tap.</p>
+        </div>
+        <div class="arrow">→</div>
+      </button>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · ZION TRIP OVERVIEW
+     ============================================================ -->
+<section class="view" data-view="zion">
+  <div class="hero">
+    <div class="bg photo-zion-canyon"></div>
+    <div class="scrim"></div>
+    <div class="grain"></div>
+    <div class="container">
+      <div class="eyebrow">Trip · 04 days · 04 cards</div>
+      <h1>Zion <span class="it">&amp;</span><br/>St. George.</h1>
+      <p class="sub">A 4-day single-women-of-SLC escape built around four activity cards from the Utah adventure deck. Hurricane home base, e-bikes up the canyon, beach days, mini golf, sunset views, pool afternoons.</p>
+      <div class="meta-row">
+        <div class="item">
+          <div class="lbl">When</div>
+          <div class="val">Jun 18 → 21</div>
+        </div>
+        <div class="item">
+          <div class="lbl">Cast</div>
+          <div class="val">Six <span class="it">(give or take)</span></div>
+        </div>
+        <div class="item">
+          <div class="lbl">Home base</div>
+          <div class="val">Hurricane, UT</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="container">
+      <div class="grid-12" style="align-items: start;">
+        <div class="col-5">
+          <div class="stamp">The trip · at a glance</div>
+          <h2 class="display">Four cards. <span class="it">Four anchor moments.</span></h2>
+          <p class="body-lg pad-top-s">Every day pivots around one or two cards from the deck. Everything else — driving, food, pool time, sleep — is connective tissue. Open any section to see the detail.</p>
+
+          <div class="pad-top-l">
+            <button class="btn primary" data-go="day-2">
+              Open daily itinerary
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <button class="btn secondary" data-go="cards" style="margin-left: 12px;">See the cards</button>
+          </div>
+        </div>
+
+        <div class="col-7">
+          <div class="rows" style="border-top: 1px solid var(--ink);">
+            <button class="row" style="width:100%; text-align:left;" data-go="cards">
+              <span class="ix">01</span>
+              <span>
+                <span class="title">The cards</span>
+                <span class="sub">Four activity cards from the Utah deck — what they are, where they slot in.</span>
+              </span>
+              <span class="pill">04 cards</span>
+              <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+            </button>
+
+            <button class="row" style="width:100%; text-align:left;" data-go="itinerary">
+              <span class="ix">02</span>
+              <span>
+                <span class="title">Daily itinerary</span>
+                <span class="sub">Day-by-day timeline, from SLC drive to Sunday beach pack-out.</span>
+              </span>
+              <span class="pill">04 days</span>
+              <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+            </button>
+
+            <button class="row" style="width:100%; text-align:left;" data-go="votes">
+              <span class="ix">03</span>
+              <span>
+                <span class="title">Decisions &amp; votes</span>
+                <span class="sub">Lodging, dinners, hikes — open items for the group to lock in.</span>
+              </span>
+              <span class="pill warn">5 open</span>
+              <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+            </button>
+
+            <button class="row" style="width:100%; text-align:left;" data-go="logistics">
+              <span class="ix">04</span>
+              <span>
+                <span class="title">Logistics &amp; bookings</span>
+                <span class="sub">Airbnb, e-bikes, two restaurant reservations.</span>
+              </span>
+              <span class="pill warn">Book this weekend</span>
+              <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+            </button>
+
+            <button class="row" style="width:100%; text-align:left;" data-go="budget">
+              <span class="ix">05</span>
+              <span>
+                <span class="title">Budget</span>
+                <span class="sub">~$510 per person, all-in. Lodging is 60% of the line.</span>
+              </span>
+              <span class="pill">~$510 pp</span>
+              <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+            </button>
+
+            <button class="row" style="width:100%; text-align:left;" data-go="packing">
+              <span class="ix">06</span>
+              <span>
+                <span class="title">Packing — group shared</span>
+                <span class="sub">Headlamps required. Two cars splitting the load.</span>
+              </span>
+              <span class="pill">8 categories</span>
+              <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-strip">
+        <div class="ps photo-canyon-overlook"><div class="cap">Friday — Canyon Overlook</div></div>
+        <div class="ps photo-zion-shuttle"><div class="cap">Saturday — Zion canyon</div></div>
+        <div class="ps photo-mini-golf"><div class="cap">Saturday — mini golf</div></div>
+        <div class="ps photo-beach"><div class="cap">Sunday — beach day</div></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · CARDS
+     ============================================================ -->
+<section class="view" data-view="cards">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">Section 01</div>
+      <h2 class="display">The four cards.</h2>
+      <p class="body-lg pad-top-s">Pulled from the Utah adventure deck. Each gets its own day or evening slot, lightly adapted to the real-world version of June 2026.</p>
+
+      <div class="card-detail pad-top-l">
+        <div class="card-block">
+          <span class="num">49</span>
+          <div class="where">Zion · East side</div>
+          <h3>Canyon Overlook at sunset</h3>
+          <p class="desc">1 mi RT slickrock, the iconic straight-down-Zion view, then late dinner in Springdale. Headlamps mandatory for the descent.</p>
+          <div class="stats">
+            <span><b>Fri</b> evening</span>
+            <span><b>$</b> · park entry only</span>
+            <span><b>2.5 hr</b> active</span>
+          </div>
+        </div>
+
+        <div class="card-block">
+          <span class="num">50</span>
+          <div class="where">Zion · Canyon</div>
+          <h3>E-bike the canyon + one hike</h3>
+          <p class="desc">Card-true e-bike up the scenic drive (closed to cars March–November), park at one trailhead, do one hike, e-bike back. Pick Emerald Pools or Riverside Walk.</p>
+          <div class="stats">
+            <span><b>Sat</b> morning</span>
+            <span><b>$60pp</b> e-bike</span>
+            <span><b>4 hr</b> active</span>
+          </div>
+        </div>
+
+        <div class="card-block">
+          <span class="num">46</span>
+          <div class="where">Washington, UT</div>
+          <h3>Mini Golf @ Stucki Farms</h3>
+          <p class="desc">Eighteen holes plus the bonus rule game — each player invents one rule before her hole. The rules get worse as the night goes on.</p>
+          <div class="stats">
+            <span><b>Sat</b> evening</span>
+            <span><b>~$10pp</b></span>
+            <span><b>90 min</b></span>
+          </div>
+        </div>
+
+        <div class="card-block">
+          <span class="num">15</span>
+          <div class="where">Hurricane, UT</div>
+          <h3>Quail Creek Reservoir <span class="it" style="font-style: italic; color: var(--accent);">+ Sand Hollow bonus</span></h3>
+          <p class="desc">Quail Creek is the card — calm reservoir, our own SUPs, card-true paddle. Saturday afternoon we add Sand Hollow for a full beach day: bigger sand, red-rock backdrop.</p>
+          <div class="stats">
+            <span><b>Sat</b> + <b>Sun</b></span>
+            <span><b>$3pp</b> day-use</span>
+            <span><b>3 hr</b> each</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actionbar">
+        <div class="container">
+          <div class="left">
+            <div class="lbl">Next section</div>
+            <div class="val">02 · Daily itinerary</div>
+          </div>
+          <button class="btn primary" data-go="itinerary">
+            Open the daily itinerary
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · ITINERARY (DAY LIST)
+     ============================================================ -->
+<section class="view" data-view="itinerary">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">Section 02</div>
+      <h2 class="display">Daily itinerary.</h2>
+      <p class="body-lg pad-top-s">Four days, click into any one.</p>
+
+      <div class="steps pad-top-l">
+        <div class="step current"><div class="num"><span>1</span></div><span>Thu · Drive day</span></div>
+        <div class="line"></div>
+        <div class="step"><div class="num"><span>2</span></div><span>Fri · Canyon Overlook</span></div>
+        <div class="line"></div>
+        <div class="step"><div class="num"><span>3</span></div><span>Sat · Big day</span></div>
+        <div class="line"></div>
+        <div class="step"><div class="num"><span>4</span></div><span>Sun · Beach + drive home</span></div>
+      </div>
+
+      <div class="rows pad-top-l" style="border-top: 1px solid var(--ink);">
+        <button class="row" style="width:100%; text-align:left;" data-go="day-1">
+          <span class="ix">01</span>
+          <span>
+            <span class="title">Drive day — SLC → Hurricane</span>
+            <span class="sub">Thu Jun 18 · ~4.5 hr · Cedar City grocery stop · arrive late, collapse</span>
+          </span>
+          <span class="pill">No card</span>
+          <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+
+        <button class="row" style="width:100%; text-align:left;" data-go="day-2">
+          <span class="ix">02</span>
+          <span>
+            <span class="title">Slow morning, sunset hike</span>
+            <span class="sub">Fri Jun 19 · Canyon Overlook at 8:48 PM · late dinner in Springdale</span>
+          </span>
+          <span class="pill">Card 49</span>
+          <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+
+        <button class="row" style="width:100%; text-align:left;" data-go="day-3">
+          <span class="ix">03</span>
+          <span>
+            <span class="title">Big day — Zion + Sand Hollow + mini golf</span>
+            <span class="sub">Sat Jun 20 · e-bike in the canyon, beach all afternoon, golf til dark</span>
+          </span>
+          <span class="pill">Cards 50 · 46 · 15</span>
+          <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+
+        <button class="row" style="width:100%; text-align:left;" data-go="day-4">
+          <span class="ix">04</span>
+          <span>
+            <span class="title">Beach day + drive home</span>
+            <span class="sub">Sun Jun 21 · Quail Creek 10–1 · on the road by 2:30 · home by 7:30</span>
+          </span>
+          <span class="pill">Card 15</span>
+          <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · DAY 1
+     ============================================================ -->
+<section class="view" data-view="day-1">
+  <div class="hero">
+    <div class="bg photo-drive"></div>
+    <div class="scrim"></div>
+    <div class="grain"></div>
+    <div class="container">
+      <div class="eyebrow">Day 01 · Thursday June 18</div>
+      <h1>Drive day.<br/><span class="it">Get there, collapse.</span></h1>
+      <div class="meta-row">
+        <div class="item"><div class="lbl">Distance</div><div class="val">305 mi</div></div>
+        <div class="item"><div class="lbl">Drive time</div><div class="val">~4.5 <span class="it">hr</span></div></div>
+        <div class="item"><div class="lbl">Card</div><div class="val">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="container">
+      <div class="grid-12">
+        <div class="col-4">
+          <div class="stamp">The evening</div>
+          <h2 class="display sm">Two cars. <span class="it">One Smith's run.</span></h2>
+          <p class="body-md pad-top-s">No card today — this is a get-there-and-collapse evening. Caravan or stagger, doesn't matter. Loud playlist mandatory.</p>
+        </div>
+        <div class="col-8">
+          <div class="timeline">
+            <div class="tl-row"><div class="time">5:30 PM</div><div class="what">Off work. Meet at one SLC starting point.</div></div>
+            <div class="tl-row"><div class="time">7:00 PM</div><div class="what"><b>Hit the road.</b> Two cars, caravan or stagger.</div></div>
+            <div class="tl-row"><div class="time">9:30 PM</div><div class="what"><b>Cedar City stop.</b> Gas, bathroom, Smith's run for Airbnb breakfasts &amp; beach-day food.</div></div>
+            <div class="tl-row"><div class="time">~11:30 PM</div><div class="what"><b>Arrive Hurricane Airbnb.</b> Drop bags. Pour something cold. Pool float optional.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actionbar">
+        <div class="container">
+          <div class="left">
+            <div class="lbl">Next day</div>
+            <div class="val">Day 02 · Friday — Canyon Overlook at sunset</div>
+          </div>
+          <button class="btn primary" data-go="day-2">
+            Open Day 02
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · DAY 2 (rich)
+     ============================================================ -->
+<section class="view" data-view="day-2">
+  <div class="hero">
+    <div class="bg photo-canyon-overlook"></div>
+    <div class="scrim"></div>
+    <div class="grain"></div>
+    <div class="container">
+      <div class="eyebrow">Day 02 · Friday June 19 · Card 49</div>
+      <h1>Slow morning.<br/><span class="it">Sunset hike.</span></h1>
+      <p class="sub">Pool until 4, drive east, walk a mile of slickrock, watch the canyon walls go amber-pink, descend with headlamps, dinner in Springdale at 9:30. Bed at midnight.</p>
+      <div class="meta-row">
+        <div class="item"><div class="lbl">Trail</div><div class="val">1 mi <span class="it">RT</span></div></div>
+        <div class="item"><div class="lbl">Sunset</div><div class="val">8:48 PM</div></div>
+        <div class="item"><div class="lbl">Headlamps</div><div class="val">Required</div></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="container">
+      <div class="grid-12">
+        <div class="col-5">
+          <div class="stamp">Card 49 · The vibe</div>
+          <h2 class="display sm">The canyon goes <span class="it">amber-pink</span> for fifteen minutes — and we are going to be standing in the middle of it.</h2>
+          <p class="body-md pad-top-m">Canyon Overlook is short, dramatic, and famously photogenic. The lot is tiny, the descent is unsafe without lights, and the late-dinner reward is real. We are tuned for sunset at 8:48 PM, which means leaving Hurricane at 5:30, hiking up at 7:15, and being on the rim by 7:45 with snacks.</p>
+        </div>
+
+        <div class="col-7">
+          <div class="timeline">
+            <div class="tl-row head"><div class="time">Morning</div><div class="what">Recovery mode</div></div>
+            <div class="tl-row"><div class="time">Sleep in</div><div class="what">Eggs, coffee, fruit. Nobody is rushed.</div></div>
+            <div class="tl-row"><div class="time">Late AM</div><div class="what"><b>Pool morning.</b> Float, gossip, group playlist, heat avoidance.</div></div>
+
+            <div class="tl-row head"><div class="time">PM</div><div class="what">East entrance loop</div></div>
+            <div class="tl-row"><div class="time">4:00 PM</div><div class="what">Light lunch · Twisted Tea Smoothie Lounge in Hurricane <em>(actual name)</em>.</div></div>
+            <div class="tl-row"><div class="time">5:30 PM</div><div class="what">Both cars head east on Hwy 9.</div></div>
+            <div class="tl-row"><div class="time">6:30 PM</div><div class="what"><b>Zion–Mt. Carmel Tunnel</b> drive-through · 1.1 mi of solid sandstone with rock-hewn windows.</div></div>
+            <div class="tl-row"><div class="time">7:00 PM</div><div class="what"><b>Park at Canyon Overlook.</b> ~15 spaces. Car #1 grabs spots; Car #2 stages at the next pullout if needed.</div></div>
+            <div class="tl-row"><div class="time">7:15 PM</div><div class="what">Hike up · 30 min.</div></div>
+            <div class="tl-row"><div class="time">7:45–8:50</div><div class="what"><b>Hang on the overlook</b> with snacks for the sunset show.</div></div>
+            <div class="tl-row warn"><div class="time">9:00 PM</div><div class="what">Hike down with <b>headlamps</b>. Slickrock is unsafe in the dark — this is non-negotiable.</div></div>
+            <div class="tl-row"><div class="time">9:30 PM</div><div class="what">Roll into Springdale for late dinner.</div></div>
+            <div class="tl-row"><div class="time">11:30 PM</div><div class="what">Back to Hurricane.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pad-top-l">
+        <div class="stamp">Moments</div>
+        <h3 class="display sm pad-top-s">Drill into any piece.</h3>
+        <div class="moments">
+          <div class="moment">
+            <div class="photo photo-zion-shuttle"><span class="tag">Tunnel</span></div>
+            <div class="body">
+              <div class="when">6:30 PM · Drive-through</div>
+              <h4>Zion–Mt. Carmel Tunnel</h4>
+              <p class="desc">1.1 mi of solid sandstone with three rock-hewn windows. Pullouts on either side for photos. Card 49 bonus.</p>
+              <div class="foot"><span>About the tunnel</span><span>→</span></div>
+            </div>
+          </div>
+          <div class="moment">
+            <div class="photo photo-canyon-overlook"><span class="tag">Trail</span></div>
+            <div class="body">
+              <div class="when">7:15 PM · 1 mi RT</div>
+              <h4>Canyon Overlook Trail</h4>
+              <p class="desc">Easy slickrock, 200 ft of gain, exposure on the canyon side. Iconic overlook at the end.</p>
+              <div class="foot"><span>Trail detail</span><span>→</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-12 pad-top-l">
+        <div class="col-6">
+          <div class="vote">
+            <div class="vote-head"><span class="stamp">Vote · open</span></div>
+            <h3>Friday dinner</h3>
+            <p class="sub">9:30 PM seating · party of 6 · Springdale.</p>
+            <ul role="radiogroup" data-vote="fri-dinner">
+              <li role="radio" data-default><span class="radio"></span><span class="label">Whiptail Grill<span class="note">Modern Southwest · prickly pear margs · closes 10 PM.</span></span><span class="badge">default</span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Oscar's Café<span class="note">Patio · casual American · longer late hours.</span></span></li>
+              <li role="radio"><span class="radio"></span><span class="label">King's Landing Bistro<span class="note">Fancier · reservations required earlier.</span></span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="vote">
+            <div class="vote-head"><span class="stamp">Vote · open</span></div>
+            <h3>Friday flow</h3>
+            <p class="sub">How to spend the daytime before the hike.</p>
+            <ul role="radiogroup" data-vote="fri-flow">
+              <li role="radio" data-default><span class="radio"></span><span class="label">Slow morning + sunset hike<span class="note">Plan default. Pool, then canyon.</span></span><span class="badge">default</span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Add midday Sand Hollow swim<span class="note">More water before the hike.</span></span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Skip Friday hike entirely<span class="note">Save it for Saturday evening.</span></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="actionbar">
+        <div class="container">
+          <div class="left">
+            <div class="lbl">Next day</div>
+            <div class="val">Day 03 · Saturday — the big one</div>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn ghost" data-go="day-1">← Day 01</button>
+            <button class="btn primary" data-go="day-3">
+              Open Day 03
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · DAY 3
+     ============================================================ -->
+<section class="view" data-view="day-3">
+  <div class="hero">
+    <div class="bg photo-zion-shuttle"></div>
+    <div class="scrim"></div>
+    <div class="grain"></div>
+    <div class="container">
+      <div class="eyebrow">Day 03 · Saturday June 20 · Cards 50 · 15 · 46</div>
+      <h1>The big day.<br/><span class="it">All three cards.</span></h1>
+      <p class="sub">E-bike Zion in the morning, Sand Hollow all afternoon, mini golf til dark. The longest day on paper — but most of it is in or near water.</p>
+      <div class="meta-row">
+        <div class="item"><div class="lbl">Morning</div><div class="val">E-bike + 1 hike</div></div>
+        <div class="item"><div class="lbl">Afternoon</div><div class="val">Sand Hollow</div></div>
+        <div class="item"><div class="lbl">Evening</div><div class="val">Stucki Farms</div></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="container">
+      <div class="grid-12">
+        <div class="col-4">
+          <div class="stamp">The day</div>
+          <h2 class="display sm">A morning in shade. <span class="it">An afternoon underwater.</span> An evening in chaos.</h2>
+          <p class="body-md pad-top-s">Saturday's heat peak is around 4 PM. The Sand Hollow block is structural — we are intentionally in water from 3 to 7. Mini golf cools off after sunset.</p>
+        </div>
+
+        <div class="col-8">
+          <div class="timeline">
+            <div class="tl-row head"><div class="time">AM · Card 50</div><div class="what">E-bike Zion canyon</div></div>
+            <div class="tl-row"><div class="time">6:30 AM</div><div class="what">Wake. Coffee. Bagels at the Airbnb.</div></div>
+            <div class="tl-row"><div class="time">7:30 AM</div><div class="what">Two cars depart Hurricane → Springdale.</div></div>
+            <div class="tl-row"><div class="time">8:15 AM</div><div class="what"><b>Park at Zion Visitor Center.</b> Lot fills by ~9 AM in June.</div></div>
+            <div class="tl-row"><div class="time">8:30 AM</div><div class="what"><b>E-bike rentals</b> in Springdale · helmets · quick orientation.</div></div>
+            <div class="tl-row"><div class="time">9:00 AM</div><div class="what">Roll up the scenic drive · car-free road · golden morning light.</div></div>
+            <div class="tl-row"><div class="time">9:30–11:30</div><div class="what">Park bikes · <b>one hike</b> (vote: Emerald Pools <em>or</em> Riverside Walk).</div></div>
+            <div class="tl-row"><div class="time">12:00 PM</div><div class="what">E-bike back · return rentals.</div></div>
+            <div class="tl-row"><div class="time">1:30 PM</div><div class="what">Lunch in Springdale · MeMe's Café (crepes + AC).</div></div>
+
+            <div class="tl-row head"><div class="time">PM · Card 15 bonus</div><div class="what">Sand Hollow beach day</div></div>
+            <div class="tl-row warn"><div class="time">3:00 PM →</div><div class="what"><b>SAND HOLLOW BEACH DAY</b>. Canopy · cooler · speaker. Heat peaks at 4 — be in the water.</div></div>
+
+            <div class="tl-row head"><div class="time">Eve · Card 46</div><div class="what">Stucki Farms mini golf</div></div>
+            <div class="tl-row"><div class="time">7:00 PM</div><div class="what">Drive to Washington · 15 min.</div></div>
+            <div class="tl-row"><div class="time">7:15–8:45</div><div class="what">Mini golf · ~$10pp · <b>bonus rule game</b>.</div></div>
+            <div class="tl-row"><div class="time">9:00 PM</div><div class="what">Dinner.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-12 pad-top-l">
+        <div class="col-6">
+          <div class="vote">
+            <div class="vote-head"><span class="stamp">Vote · open</span></div>
+            <h3>The one hike</h3>
+            <p class="sub">Pick one — we e-bike there and park.</p>
+            <ul role="radiogroup" data-vote="sat-hike">
+              <li role="radio" data-default><span class="radio"></span><span class="label">Riverside Walk<span class="note">2.2 mi · flat · shaded · ends where The Narrows begin.</span></span><span class="badge">default</span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Lower + Middle Emerald Pools<span class="note">2.0 mi · trail passes under a waterfall.</span></span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="vote">
+            <div class="vote-head"><span class="stamp">Vote · open</span></div>
+            <h3>Saturday dinner</h3>
+            <p class="sub">9 PM seating · party of 6 · Washington / St. George.</p>
+            <ul role="radiogroup" data-vote="sat-dinner">
+              <li role="radio" data-default><span class="radio"></span><span class="label">Cliffside Restaurant<span class="note">Best views · slightly fancier.</span></span><span class="badge">default</span></li>
+              <li role="radio"><span class="radio"></span><span class="label">George's Corner<span class="note">Casual American.</span></span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Cook at the Airbnb<span class="note">Group cook-along + pool sunset.</span></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="actionbar">
+        <div class="container">
+          <div class="left">
+            <div class="lbl">Next day</div>
+            <div class="val">Day 04 · Sunday — beach + drive home</div>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn ghost" data-go="day-2">← Day 02</button>
+            <button class="btn primary" data-go="day-4">
+              Open Day 04
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · DAY 4
+     ============================================================ -->
+<section class="view" data-view="day-4">
+  <div class="hero">
+    <div class="bg photo-beach"></div>
+    <div class="scrim"></div>
+    <div class="grain"></div>
+    <div class="container">
+      <div class="eyebrow">Day 04 · Sunday June 21 · Card 15</div>
+      <h1>Beach day.<br/><span class="it">Drive home.</span></h1>
+      <p class="sub">A slow start, three hours on the reservoir, the long drive back up I-15.</p>
+      <div class="meta-row">
+        <div class="item"><div class="lbl">Beach window</div><div class="val">10 → 1 PM</div></div>
+        <div class="item"><div class="lbl">Drive home</div><div class="val">~5 hr</div></div>
+        <div class="item"><div class="lbl">Home by</div><div class="val">~7:30 PM</div></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="container">
+      <div class="grid-12">
+        <div class="col-4">
+          <div class="stamp">The day</div>
+          <h2 class="display sm">Quail Creek <span class="it">because it's the card.</span></h2>
+          <p class="body-md pad-top-s">We hit Sand Hollow Saturday, so Sunday belongs to the card. SUPs on calm reservoir water, then home.</p>
+        </div>
+        <div class="col-8">
+          <div class="timeline">
+            <div class="tl-row"><div class="time">8:00 AM</div><div class="what">Slow Airbnb breakfast — eggs, fruit, coffee.</div></div>
+            <div class="tl-row"><div class="time">9:00 AM</div><div class="what"><b>Pack out</b> of the Airbnb. Late checkout if the host allows. Load SUPs on the cars.</div></div>
+            <div class="tl-row"><div class="time">9:30 AM</div><div class="what">Drive to <b>Quail Creek</b> · day-use $10/car · drop in the SUPs.</div></div>
+            <div class="tl-row"><div class="time">10–1 PM</div><div class="what"><b>Beach hangs.</b> Paddle when you feel like it. Float. Photos. Snacks.</div></div>
+            <div class="tl-row"><div class="time">1:00 PM</div><div class="what">Pack out · heat peaks · water gets choppy.</div></div>
+            <div class="tl-row"><div class="time">1:30 PM</div><div class="what">Lunch · River Rock Roasting (La Verkin · patio + AC).</div></div>
+            <div class="tl-row"><div class="time">2:30 PM</div><div class="what">Hit the road back to SLC.</div></div>
+            <div class="tl-row"><div class="time">~7:30 PM</div><div class="what"><b>Home.</b> Couch. Tan lines. The group chat that won't stop for a week.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actionbar">
+        <div class="container">
+          <div class="left">
+            <div class="lbl">Back to</div>
+            <div class="val">Trip overview</div>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn ghost" data-go="day-3">← Day 03</button>
+            <button class="btn primary" data-go="zion">Trip overview</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · VOTES & DECISIONS
+     ============================================================ -->
+<section class="view" data-view="votes">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">Section 03</div>
+      <h2 class="display">Decisions <span class="it">&amp; votes.</span></h2>
+      <p class="body-lg pad-top-s">Tap an option to mark our pick — your choices save on this device.</p>
+
+      <div class="grid-12 pad-top-l">
+        <div class="col-6">
+          <div class="vote">
+            <div class="vote-head"><span class="stamp">Vote · 01 of 05</span></div>
+            <h3>Lodging vibe</h3>
+            <p class="sub">3 nights, sleeps 6, June 18–21.</p>
+            <ul role="radiogroup" data-vote="lodging">
+              <li role="radio" data-default><span class="radio"></span><span class="label">Hurricane Airbnb · private pool<span class="note">Plan default. ~$300pp total. Pool &gt; everything in June.</span></span><span class="badge">default</span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Glamping at Zion Wildflower<span class="note">Adds 30–40 min back west for golf + beach.</span></span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Hotel in St. George<span class="note">Easier check-in · no group cooking.</span></span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Camp at Quail Creek<span class="note">Uses Card 15's bonus night.</span></span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="vote">
+            <div class="vote-head"><span class="stamp">Vote · 02 of 05</span></div>
+            <h3>Friday flow</h3>
+            <p class="sub">Daytime before the sunset hike.</p>
+            <ul role="radiogroup" data-vote="fri-flow-2">
+              <li role="radio" data-default><span class="radio"></span><span class="label">Slow morning + sunset hike<span class="note">Plan default. Pool, then canyon.</span></span><span class="badge">default</span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Add midday Sand Hollow swim<span class="note">More water before the hike.</span></span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Skip Friday hike entirely<span class="note">Save it for Saturday evening.</span></span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="vote">
+            <div class="vote-head"><span class="stamp">Vote · 03 of 05</span></div>
+            <h3>Friday dinner</h3>
+            <p class="sub">Springdale · 9:30 PM · party of 6.</p>
+            <ul role="radiogroup" data-vote="fri-dinner-2">
+              <li role="radio" data-default><span class="radio"></span><span class="label">Whiptail Grill<span class="note">Modern Southwest · prickly pear margs.</span></span><span class="badge">default</span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Oscar's Café<span class="note">Patio · casual American.</span></span></li>
+              <li role="radio"><span class="radio"></span><span class="label">King's Landing Bistro<span class="note">Fancier · earlier reservation.</span></span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="vote">
+            <div class="vote-head"><span class="stamp">Vote · 04 of 05</span></div>
+            <h3>Saturday hike (pick one)</h3>
+            <p class="sub">We e-bike there and park — only one hike fits.</p>
+            <ul role="radiogroup" data-vote="sat-hike-2">
+              <li role="radio" data-default><span class="radio"></span><span class="label">Riverside Walk<span class="note">2.2 mi · flat · shaded.</span></span><span class="badge">default</span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Lower + Middle Emerald Pools<span class="note">2.0 mi · trail passes under a waterfall.</span></span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="vote">
+            <div class="vote-head"><span class="stamp">Vote · 05 of 05</span></div>
+            <h3>Saturday dinner</h3>
+            <p class="sub">Washington / St. George · 9 PM · party of 6.</p>
+            <ul role="radiogroup" data-vote="sat-dinner-2">
+              <li role="radio" data-default><span class="radio"></span><span class="label">Cliffside Restaurant<span class="note">Best views · slightly fancier.</span></span><span class="badge">default</span></li>
+              <li role="radio"><span class="radio"></span><span class="label">George's Corner<span class="note">Casual American.</span></span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Centro Pizzeria<span class="note">Chill pies + drinks.</span></span></li>
+              <li role="radio"><span class="radio"></span><span class="label">Cook at the Airbnb<span class="note">Group cook-along + pool sunset.</span></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · LOGISTICS
+     ============================================================ -->
+<section class="view" data-view="logistics">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">Section 04</div>
+      <h2 class="display">Logistics <span class="it">&amp; bookings.</span></h2>
+      <p class="body-lg pad-top-s">Three real bookings to make. Two are blocking. One is ~6 weeks out.</p>
+
+      <div class="rows pad-top-l" style="border-top: 1px solid var(--ink);">
+        <div class="row" style="cursor: default;">
+          <span class="ix">01</span>
+          <span>
+            <span class="title">Hurricane Airbnb</span>
+            <span class="sub">3 nights · sleeps 6 · private pool · Thu/Fri/Sat</span>
+          </span>
+          <span class="pill warn">This weekend</span>
+          <span class="chev"></span>
+        </div>
+        <div class="row" style="cursor: default;">
+          <span class="ix">02</span>
+          <span>
+            <span class="title">E-bike rentals · Springdale</span>
+            <span class="sub">6 bikes · Saturday morning · helmets included · ~$60pp</span>
+          </span>
+          <span class="pill warn">2 weeks out</span>
+          <span class="chev"></span>
+        </div>
+        <div class="row" style="cursor: default;">
+          <span class="ix">03</span>
+          <span>
+            <span class="title">Friday dinner · Springdale</span>
+            <span class="sub">9:30 PM · party of 6 · pending vote (slide 03)</span>
+          </span>
+          <span class="pill">2 weeks out</span>
+          <span class="chev"></span>
+        </div>
+        <div class="row" style="cursor: default;">
+          <span class="ix">04</span>
+          <span>
+            <span class="title">Saturday dinner · Washington / St. George</span>
+            <span class="sub">9 PM · party of 6 · pending vote (slide 03)</span>
+          </span>
+          <span class="pill">2 weeks out</span>
+          <span class="chev"></span>
+        </div>
+      </div>
+
+      <div class="map">
+        <svg class="legs" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <g stroke="#00ADEF" stroke-width="0.25" stroke-dasharray="1.5 1.5" fill="none" opacity="0.6">
+            <line x1="48" y1="55" x2="18" y2="58" />
+            <line x1="48" y1="55" x2="32" y2="30" />
+            <line x1="48" y1="55" x2="38" y2="85" />
+            <line x1="48" y1="55" x2="84" y2="52" />
+            <line x1="48" y1="55" x2="80" y2="28" />
+          </g>
+        </svg>
+        <div class="pin home" style="left: 48%; top: 55%;"><div class="dot"></div><div class="lbl">Hurricane</div></div>
+        <div class="pin" style="left: 18%; top: 58%;"><div class="dot"></div><div class="lbl">Stucki · 15 min</div></div>
+        <div class="pin" style="left: 32%; top: 30%;"><div class="dot"></div><div class="lbl">Quail Creek · 10 min</div></div>
+        <div class="pin" style="left: 38%; top: 85%;"><div class="dot"></div><div class="lbl">Sand Hollow · 15 min</div></div>
+        <div class="pin" style="left: 84%; top: 52%;"><div class="dot"></div><div class="lbl">Springdale · 40 min</div></div>
+        <div class="pin" style="left: 80%; top: 28%;"><div class="dot"></div><div class="lbl">Canyon Overlook · 50 min</div></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · BUDGET
+     ============================================================ -->
+<section class="view" data-view="budget">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">Section 05</div>
+      <h2 class="display">Budget.</h2>
+      <p class="body-lg pad-top-s">All-in, per person, group of 6.</p>
+
+      <div class="grid-12 pad-top-l">
+        <div class="col-7">
+          <div style="border: 1px solid var(--rule); border-radius: 6px; padding: 36px;">
+            <div class="stamp">Per person</div>
+            <div style="font-family: var(--serif); font-size: 140px; line-height: 0.9; letter-spacing: -0.02em; margin-top: 8px;">~$<span style="font-style:italic; color: var(--accent);">510</span></div>
+
+            <div style="height: 56px; display: flex; margin-top: 32px; border-radius: 4px; overflow: hidden;">
+              <div style="background:#00ADEF; flex: 300; display:flex; align-items:center; justify-content:center; color:white; font-size:13px; font-weight:600;">Lodging $300</div>
+              <div style="background:#3A8FB8; flex: 140; display:flex; align-items:center; justify-content:center; color:white; font-size:13px;">Food $140</div>
+              <div style="background:#7CB8D8; flex: 60; display:flex; align-items:center; justify-content:center; color:white; font-size:12px;">E-bike $60</div>
+              <div style="background:#A8C8D8; flex: 30; display:flex; align-items:center; justify-content:center; color:white; font-size:12px;">$30</div>
+              <div style="background:#C8D8E0; flex: 25; display:flex; align-items:center; justify-content:center; color:white; font-size:11px;">$25</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; margin-top: 28px;">
+              <div style="display:flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--rule); font-size: 14px;"><span>Lodging</span><b>~$300</b></div>
+              <div style="display:flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--rule); font-size: 14px;"><span>Food</span><b>~$140</b></div>
+              <div style="display:flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--rule); font-size: 14px;"><span>E-bike rental</span><b>~$60</b></div>
+              <div style="display:flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--rule); font-size: 14px;"><span>Gas</span><b>~$30</b></div>
+              <div style="display:flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--rule); font-size: 14px;"><span>Zion entry</span><b>~$12</b></div>
+              <div style="display:flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--rule); font-size: 14px;"><span>Mini golf</span><b>~$10</b></div>
+              <div style="display:flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--rule); font-size: 14px;"><span>Day-use fees</span><b>~$6</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-5">
+          <div class="facts" style="margin-top: 0; grid-template-columns: 1fr; border-top: 1px solid var(--ink);">
+            <div class="fact" style="border-right:none;"><div class="lbl">Per person · per night</div><div class="val">~$170</div></div>
+            <div class="fact" style="border-right:none;"><div class="lbl">Biggest line</div><div class="val">Lodging<span class="sm">60% of total</span></div></div>
+            <div class="fact" style="border-right:none;"><div class="lbl">Cheapest moment</div><div class="val">Reservoir <span class="it">paddle</span></div></div>
+            <div class="fact" style="border-right:none; border-bottom: none;"><div class="lbl">Saved by BYO SUPs</div><div class="val">~$75 <span class="sm">vs rentals</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · PACKING
+     ============================================================ -->
+<section class="view" data-view="packing">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">Section 06</div>
+      <h2 class="display">Packing — <span class="it">group shared.</span></h2>
+      <p class="body-lg pad-top-s">Divided across two cars. Click a category to expand items.</p>
+
+      <div class="rows pad-top-l" style="border-top: 1px solid var(--ink);">
+        <div class="row" style="cursor:default;">
+          <span class="ix">01</span>
+          <span><span class="title">Headlamps</span><span class="sub">One per person. Friday descent on slickrock is unsafe without — the only true non-negotiable.</span></span>
+          <span class="pill warn">Required</span>
+          <span class="chev"></span>
+        </div>
+        <div class="row" style="cursor:default;">
+          <span class="ix">02</span>
+          <span><span class="title">Hydration</span><span class="sub">Cooler with electrolyte drinks · Liquid IV · LMNT · plain water as ballast.</span></span>
+          <span class="pill"></span>
+          <span class="chev"></span>
+        </div>
+        <div class="row" style="cursor:default;">
+          <span class="ix">03</span>
+          <span><span class="title">SUP gear</span><span class="sub">Roof racks &amp; tie-downs (3 boards/car) · pump · repair kit · extra fins.</span></span>
+          <span class="pill"></span>
+          <span class="chev"></span>
+        </div>
+        <div class="row" style="cursor:default;">
+          <span class="ix">04</span>
+          <span><span class="title">Beach</span><span class="sub">Pop-up canopy · chairs · beach towels · Bluetooth speaker · sand toys.</span></span>
+          <span class="pill"></span>
+          <span class="chev"></span>
+        </div>
+        <div class="row" style="cursor:default;">
+          <span class="ix">05</span>
+          <span><span class="title">Sun</span><span class="sub">UPF sun shirts · wide-brim hats · reef-safe sunscreen · lip SPF.</span></span>
+          <span class="pill"></span>
+          <span class="chev"></span>
+        </div>
+        <div class="row" style="cursor:default;">
+          <span class="ix">06</span>
+          <span><span class="title">Water bottles</span><span class="sub">2L per person — Hydroflask scale, not 16 oz.</span></span>
+          <span class="pill"></span>
+          <span class="chev"></span>
+        </div>
+        <div class="row" style="cursor:default;">
+          <span class="ix">07</span>
+          <span><span class="title">First aid</span><span class="sub">Blister pads · ibuprofen · electrolyte tabs · aloe gel.</span></span>
+          <span class="pill"></span>
+          <span class="chev"></span>
+        </div>
+        <div class="row" style="cursor:default;">
+          <span class="ix">08</span>
+          <span><span class="title">Zion-day kit</span><span class="sub">Small backpack each · salty snacks · light long-sleeve UPF · river shoes.</span></span>
+          <span class="pill"></span>
+          <span class="chev"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · STUB (other summer events)
+     ============================================================ -->
+<section class="view" data-view="bees">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">June 16 · Tuesday · 6:30 PM</div>
+      <h2 class="display">Bees Game <span class="it">🐝⚾️</span></h2>
+      <p class="body-lg pad-top-s">Daybreak Ballpark, South Jordan. Evening game — bring a sweatshirt, it gets breezy.</p>
+      <p class="body-md pad-top-m" style="max-width:680px;">Tickets are cheap; the official Salt Lake Bees site has the best seats for the least money. <a href="https://www.milb.com/salt-lake/tickets" target="_blank" rel="noopener" style="color:var(--accent);">milb.com/salt-lake/tickets</a>.</p>
+      <div class="pad-top-l cal-stack">
+        <span data-cal="true"
+              data-cal-title="Bees Game"
+              data-cal-start="20260616T183000"
+              data-cal-end="20260616T213000"
+              data-cal-location="Salt Lake Bees - Daybreak Ballpark, 11111 South Ballpark Way, South Jordan, UT 84009"
+              data-cal-description="Daybreak Ballpark. Bring a sweatshirt — evening games get breezy."></span>
+        <button class="btn ghost" data-go="summer">← All events</button>
+      </div>
+    </div>
+  </section>
+</section>
+<section class="view" data-view="brunch">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">June 13 · Saturday · 9:30 AM</div>
+      <h2 class="display">Butterflies + <span class="it">Brunch.</span> 🦋🥂</h2>
+      <p class="body-lg pad-top-s">Brunch at <b>Aubergine Kitchen</b> in Lehi, then over to the Butterfly Biosphere at Thanksgiving Point.</p>
+      <p class="body-md pad-top-m" style="max-width:680px;">Doubling as a little celebration for <b>Ivanna</b> — she booked her first role. 🎬</p>
+      <p class="body-md pad-top-s" style="max-width:680px;">Biosphere tickets: <a href="https://thanksgivingpoint.org/visit/tickets/" target="_blank" rel="noopener" style="color:var(--accent);">thanksgivingpoint.org</a> · Brunch is a walk-in.</p>
+      <div class="pad-top-l cal-stack">
+        <span data-cal="true"
+              data-cal-title="Butterflies + Brunch"
+              data-cal-start="20260613T093000"
+              data-cal-end="20260613T120000"
+              data-cal-location="Aubergine Kitchen, 3430 N Ashton Blvd, Lehi, UT 84043"
+              data-cal-description="Brunch at Aubergine, then Butterfly Biosphere at Thanksgiving Point. Celebrating Ivanna's first booked role."></span>
+        <button class="btn ghost" data-go="summer">← All events</button>
+      </div>
+    </div>
+  </section>
+</section>
+<section class="view" data-view="stars">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">June 10 · Wednesday</div>
+      <h2 class="display">Star Party at the U.</h2>
+      <p class="body-lg pad-top-s">9–10 PM at the University of Utah's observatory. Free, walk-up. Bring layers — the dome runs cold.</p>
+      <div class="pad-top-l cal-stack">
+        <span data-cal="true"
+              data-cal-title="Star Party at the U"
+              data-cal-start="20260610T210000"
+              data-cal-end="20260610T220000"
+              data-cal-location="South Physics Observatory, University of Utah, Salt Lake City, UT"
+              data-cal-description="Free, walk-up. Bring layers — the dome runs cold."></span>
+        <button class="btn ghost" data-go="summer">← All events</button>
+      </div>
+    </div>
+  </section>
+</section>
+<section class="view" data-view="race">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">June 12 · Friday</div>
+      <h2 class="display">Desert Thunder Racetrack.</h2>
+      <p class="body-lg pad-top-s">In Price, UT. We'd leave SLC around 7 PM. Carpool TBD. Ear protection: required.</p>
+      <div class="pad-top-l cal-stack">
+        <span data-cal="true"
+              data-cal-title="Desert Thunder Raceway"
+              data-cal-start="20260612T190000"
+              data-cal-end="20260612T235900"
+              data-cal-location="Desert Thunder Raceway, Price, UT"
+              data-cal-description="Leave SLC around 7 PM. Carpool TBD. Ear protection: required."></span>
+        <button class="btn ghost" data-go="summer">← All events</button>
+      </div>
+    </div>
+  </section>
+</section>
+<section class="view" data-view="craft">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">June 28 · Sunday</div>
+      <h2 class="display">Summer Craft Night.</h2>
+      <p class="body-lg pad-top-s">Keychains and charms at Kate's, then a movie. BYO snack rotation continues.</p>
+      <div class="pad-top-l cal-stack">
+        <span data-cal="true"
+              data-cal-title="Summer Craft Night"
+              data-cal-start="20260628T180000"
+              data-cal-end="20260628T220000"
+              data-cal-location="Kate's place"
+              data-cal-description="Keychains and charms at Kate's, then a movie. BYO snack rotation continues."></span>
+        <button class="btn ghost" data-go="summer">← All events</button>
+      </div>
+    </div>
+  </section>
+</section>
+<section class="view" data-view="rodeo">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">July 24 · Friday · 8 PM</div>
+      <h2 class="display">Days of '47 <span class="it">Rodeo.</span> 🐎🇺🇸🎆</h2>
+      <p class="body-lg pad-top-s">Utah's flagship rodeo at the Days of '47 Arena in Salt Lake. Sunset finale, fireworks, the whole production.</p>
+      <p class="body-md pad-top-m" style="max-width:680px;">Tickets via the official site: <a href="https://www.daysof47.com/rodeo" target="_blank" rel="noopener" style="color:var(--accent);">daysof47.com/rodeo</a>.</p>
+      <div class="pad-top-l cal-stack">
+        <span data-cal="true"
+              data-cal-title="Days of '47 Rodeo"
+              data-cal-start="20260724T200000"
+              data-cal-end="20260724T220000"
+              data-cal-location="Days of '47 Arena, Utah State Fairpark, Salt Lake City, UT"
+              data-cal-description="Utah's flagship rodeo. Sunset finale + fireworks."></span>
+        <button class="btn ghost" data-go="summer">← All events</button>
+      </div>
+    </div>
+  </section>
+</section>
+<section class="view" data-view="concert">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">July 17 · Friday · 6:30 PM</div>
+      <h2 class="display">Hilary Duff <span class="it">Concert.</span> 🎶🦋</h2>
+      <p class="body-lg pad-top-s">Utah First Credit Union Amphitheatre, West Valley. The reunion-tour energy we've been waiting two decades for.</p>
+      <p class="body-md pad-top-m" style="max-width:680px;">Carpool from SLC — about 20 min west. Gates open at 6:30, show starts whenever pop princesses decide.</p>
+      <p class="body-md pad-top-s" style="max-width:680px;"><i>Ticket link coming — add when locked in.</i></p>
+      <div class="pad-top-l cal-stack">
+        <span data-cal="true"
+              data-cal-title="Hilary Duff Concert"
+              data-cal-start="20260717T183000"
+              data-cal-end="20260717T213000"
+              data-cal-location="Utah First Credit Union Amphitheatre, 5150 Upper Ridge Rd, West Valley City, UT 84118"
+              data-cal-description="Hilary Duff at the new West Valley amphitheatre. Carpool from SLC."></span>
+        <button class="btn ghost" data-go="summer">← All events</button>
+      </div>
+    </div>
+  </section>
+</section>
+<section class="view" data-view="pride">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">June 7 · Sunday · 12 PM</div>
+      <h2 class="display">Utah Pride <span class="it">Festival.</span> 🌈✨</h2>
+      <p class="body-lg pad-top-s">Downtown SLC, Washington Square Park. The festival is the Saturday-Sunday energy peak of the weekend — we'll do Sunday afternoon, 12–4 PM, beat the worst of the heat.</p>
+      <p class="body-md pad-top-m" style="max-width:680px;"><b>Tickets:</b> <a href="https://utahpride.org/tickets" target="_blank" rel="noopener" style="color:var(--accent);">utahpride.org/tickets</a> · <b>Festival info:</b> <a href="https://utahpride.org/events/pride-fest" target="_blank" rel="noopener" style="color:var(--accent);">utahpride.org</a>.</p>
+      <p class="body-md pad-top-s" style="max-width:680px;">Meet at the south entrance. Bring water, sunscreen, and your rainbow gear of choice.</p>
+      <div class="pad-top-l cal-stack">
+        <span data-cal="true"
+              data-cal-title="Utah Pride Festival"
+              data-cal-start="20260607T120000"
+              data-cal-end="20260607T160000"
+              data-cal-location="451 S State St, Salt Lake City, UT 84111"
+              data-cal-description="Sunday afternoon at Utah Pride. Tickets via utahpride.org."></span>
+        <button class="btn ghost" data-go="summer">← All events</button>
+      </div>
+    </div>
+  </section>
+</section>
+<section class="view" data-view="vietnam">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">September 25 → October 8 · Fri–Thu</div>
+      <h2 class="display">Vietnam. <span class="it">✈️ 🌿</span></h2>
+      <p class="body-lg pad-top-s">Two weeks across Vietnam. The "we've been saying we'd do this for years" trip — finally on the calendar.</p>
+      <p class="body-md pad-top-m" style="max-width:680px;">Loose plan: Hanoi → Ha Long Bay → Hoi An → beach stretch (Da Nang or Phu Quoc) → Ho Chi Minh. Itinerary, lodging, and flight bookings all TBD — full trip page coming.</p>
+      <p class="body-sm pad-top-s" style="font-style: italic; color: var(--ink-2);">Passport check: yes. Visa check: e-visa needed for US citizens — apply ~6 weeks before. Vaccine check: TBD with travel clinic.</p>
+      <div class="pad-top-l cal-stack">
+        <span data-cal="true"
+              data-cal-title="Vietnam"
+              data-cal-start="20260925"
+              data-cal-end="20261009"
+              data-cal-all-day="true"
+              data-cal-location="Vietnam"
+              data-cal-description="Two weeks across Vietnam. Itinerary TBD."></span>
+        <button class="btn ghost" data-go="summer">← All events</button>
+      </div>
+    </div>
+  </section>
+</section>
+<section class="view" data-view="coast">
+  <section class="block">
+    <div class="container">
+      <div class="stamp">August 5 → 9 · Wed–Sat</div>
+      <h2 class="display">Oregon Coast <span class="it">Roadtrip.</span> 🌊🚐</h2>
+      <p class="body-lg pad-top-s">Five days, PNW reset. Cannon Beach, tidepools, foggy mornings, fleeces in August. Details to come — trip page in progress.</p>
+      <p class="body-sm pad-top-s" style="font-style: italic; color: var(--ink-2);">Full itinerary coming soon — beaches, dinner stops, the works.</p>
+      <div class="pad-top-l cal-stack">
+        <span data-cal="true"
+              data-cal-title="Oregon Coast Roadtrip"
+              data-cal-start="20260805"
+              data-cal-end="20260810"
+              data-cal-all-day="true"
+              data-cal-location="Oregon Coast"
+              data-cal-description="Group roadtrip — five days on the Oregon coast."></span>
+        <button class="btn ghost" data-go="summer">← All events</button>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · MEMORIES (list of past events)
+     ============================================================ -->
+<section class="view" data-view="memories">
+  <div class="hero short">
+    <div class="bg photo-summer"></div>
+    <div class="scrim"></div>
+    <div class="grain"></div>
+    <div class="container">
+      <div class="eyebrow"><span id="memoriesCount">—</span> · The receipts</div>
+      <h1>Memories<span class="it">.</span></h1>
+      <p class="sub">Every event that's already happened, with the photos to prove it. Tap any one to scroll the gallery, save the originals, or grab a Story-ready version in a single tap.</p>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="container">
+      <div class="memories-grid" id="memoriesGrid"><!-- populated by JS --></div>
+      <div class="memories-empty" id="memoriesEmpty" hidden>
+        <div class="icon">📸</div>
+        <h3>No past events yet.</h3>
+        <p>This page fills up automatically as events pass and you drop photos in the Drive folder. Check back after the next hang.</p>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================
+     VIEW · MEMORY DETAIL (populated dynamically)
+     ============================================================ -->
+<section class="view" data-view="memory-detail">
+  <div class="memory-hero">
+    <div class="bg" id="memHeroBg"></div>
+    <div class="scrim"></div>
+    <div class="container">
+      <div class="eyebrow" id="memEyebrow">—</div>
+      <h1 id="memTitle">—</h1>
+      <p class="sub" id="memSub">—</p>
+    </div>
+  </div>
+
+  <section class="block souvenir">
+    <div class="container">
+      <div class="grid">
+
+        <div class="souvenir-card souvenir-song">
+          <div class="stamp">The Soundtrack</div>
+          <h4>The song <span style="font-style:italic">of</span> this day</h4>
+          <div id="memSongHost"><!-- populated by JS --></div>
+        </div>
+
+        <div class="souvenir-card souvenir-sticker">
+          <div class="stamp">The Souvenir</div>
+          <h4>Sticker — yours to keep</h4>
+          <div class="preview"><canvas id="memSticker" width="720" height="880"></canvas></div>
+          <div class="actions">
+            <button class="stk-btn primary" id="memStickerDownload">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span id="memStickerDownloadLabel">Download sticker</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="container">
+      <p class="body-md" style="max-width:640px;">Tap any photo to save it to your phone or generate an Instagram-Story-ready version with the event title overlaid.</p>
+      <div class="gallery" id="memGallery"><!-- populated by JS --></div>
+      <div class="pad-top-l"><button class="btn ghost" data-go="memories">← All memories</button></div>
+    </div>
+  </section>
+</section>
+
+</main>
+
+<!-- ============================================================
+     LIGHTBOX (photo viewer)
+     ============================================================ -->
+<div class="lightbox" id="lightbox" role="dialog" aria-hidden="true">
+  <div class="lb-top">
+    <div class="meta"><b id="lbTitle">—</b><span id="lbDate">—</span></div>
+    <button class="lb-close" id="lbClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="lb-stage" id="lbStage"></div>
+  <div class="lb-actions">
+    <a class="lb-btn primary" id="lbSave" download>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span id="lbSaveLabel">Save photo</span>
+    </a>
+    <button class="lb-btn" id="lbStory">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="3"/><circle cx="12" cy="14" r="3"/><circle cx="17" cy="6" r="0.6" fill="currentColor"/></svg>
+      Make Story
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     STORY MODAL (9:16 IG-story-ready)
+     ============================================================ -->
+<div class="story-modal" id="storyModal" role="dialog" aria-hidden="true">
+  <div class="panel">
+    <button class="sm-close" id="smClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="stamp">Story · Ready to share</div>
+    <h3>9 <span class="it">×</span> 16</h3>
+    <p>Save and post — it's already sized for Instagram Stories.</p>
+    <div class="story-canvas-wrap"><canvas id="storyCanvas" width="1080" height="1920"></canvas></div>
+    <div class="story-actions">
+      <button class="sm-btn primary" id="smDownload">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download
+      </button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="mark">The Group Chat<span style="color: var(--accent);">:</span> <span style="font-style:italic">IRL</span></div>
+    <div class="nav">
+      <a href="#/summer">Agenda</a>
+      <a href="#/memories">Memories</a>
+      <a href="#/zion">Zion</a>
+      <a href="#">Group chat</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ============================================================
+  //   ROUTING — hash-based, view toggles
+  // ============================================================
+  const ROUTES = {
+    'summer':     { view: 'summer',     title: 'The Agenda',  crumb: ['The Agenda'] },
+    'zion':       { view: 'zion',       title: 'Zion · St. George', crumb: ['The Agenda', 'Zion · St. George'] },
+    'cards':      { view: 'cards',      title: 'The four cards', crumb: ['The Agenda', 'Zion · St. George', 'The four cards'] },
+    'itinerary':  { view: 'itinerary',  title: 'Daily itinerary', crumb: ['The Agenda', 'Zion · St. George', 'Daily itinerary'] },
+    'day-1':      { view: 'day-1',      title: 'Day 01 · Thursday', crumb: ['The Agenda', 'Zion · St. George', 'Daily itinerary', 'Day 01'] },
+    'day-2':      { view: 'day-2',      title: 'Day 02 · Friday', crumb: ['The Agenda', 'Zion · St. George', 'Daily itinerary', 'Day 02'] },
+    'day-3':      { view: 'day-3',      title: 'Day 03 · Saturday', crumb: ['The Agenda', 'Zion · St. George', 'Daily itinerary', 'Day 03'] },
+    'day-4':      { view: 'day-4',      title: 'Day 04 · Sunday', crumb: ['The Agenda', 'Zion · St. George', 'Daily itinerary', 'Day 04'] },
+    'votes':      { view: 'votes',      title: 'Decisions & votes', crumb: ['The Agenda', 'Zion · St. George', 'Decisions & votes'] },
+    'logistics':  { view: 'logistics',  title: 'Logistics', crumb: ['The Agenda', 'Zion · St. George', 'Logistics'] },
+    'budget':     { view: 'budget',     title: 'Budget', crumb: ['The Agenda', 'Zion · St. George', 'Budget'] },
+    'packing':    { view: 'packing',    title: 'Packing', crumb: ['The Agenda', 'Zion · St. George', 'Packing'] },
+    'bees':       { view: 'bees',       title: 'Bees Baseball', crumb: ['The Agenda', 'Bees Baseball'] },
+    'brunch':     { view: 'brunch',     title: 'Brunch & Butterflies', crumb: ['The Agenda', 'Brunch & Butterflies'] },
+    'stars':      { view: 'stars',      title: 'Star Party', crumb: ['The Agenda', 'Star Party'] },
+    'race':       { view: 'race',       title: 'Desert Thunder', crumb: ['The Agenda', 'Desert Thunder'] },
+    'craft':      { view: 'craft',      title: 'Craft Night', crumb: ['The Agenda', 'Craft Night'] },
+    'rodeo':      { view: 'rodeo',      title: "Days of '47 Rodeo", crumb: ['The Agenda', "Days of '47 Rodeo"] },
+    'concert':    { view: 'concert',    title: 'Hilary Duff Concert', crumb: ['The Agenda', 'Hilary Duff Concert'] },
+    'coast':      { view: 'coast',      title: 'Oregon Coast Roadtrip', crumb: ['The Agenda', 'Oregon Coast Roadtrip'] },
+    'pride':      { view: 'pride',      title: 'Utah Pride Festival', crumb: ['The Agenda', 'Utah Pride Festival'] },
+    'vietnam':    { view: 'vietnam',    title: 'Vietnam Trip', crumb: ['The Agenda', 'Vietnam Trip'] },
+    'memories':   { view: 'memories',   title: 'Memories', crumb: ['The Agenda', 'Memories'] },
+    'memory-hike-may-9-2026':       { view: 'memory-detail', title: 'Morning Hike at Donut Falls', crumb: ['The Agenda', 'Memories', 'Morning Hike'], memoryKey: 'hike-may-9-2026' },
+    'memory-hockey-april-11-2026':  { view: 'memory-detail', title: 'Grizzlies Hockey Night', crumb: ['The Agenda', 'Memories', 'Grizzlies Hockey Night'], memoryKey: 'hockey-april-11-2026' },
+  };
+
+  const HISTORY = [];
+
+  function go(key, opts) {
+    if (!ROUTES[key]) key = 'summer';
+    if (!opts || !opts.replace) HISTORY.push(key);
+    window.location.hash = '#/' + key;
+  }
+
+  function renderRoute() {
+    const raw = (window.location.hash || '#/summer').replace(/^#\/?/, '');
+    const key = ROUTES[raw] ? raw : 'summer';
+    const route = ROUTES[key];
+
+    // Toggle view
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const el = document.querySelector(`[data-view="${route.view}"]`);
+    if (el) el.classList.add('active');
+
+    // Update title + crumb
+    document.title = route.title + " · The Group Chat: IRL ✨";
+    const crumb = document.getElementById('crumb');
+    crumb.innerHTML = route.crumb
+      .map((c, i) => i === route.crumb.length - 1
+        ? `<span class="here">${c}</span>`
+        : c)
+      .join('<span class="sep">/</span>');
+
+    // Scroll to top of view
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  // ============================================================
+  //   EVENT BINDING
+  // ============================================================
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest('[data-go]');
+    if (target) {
+      e.preventDefault();
+      go(target.dataset.go);
+      return;
+    }
+    const back = e.target.closest('[data-back]');
+    if (back) {
+      e.preventDefault();
+      const cur = (window.location.hash || '#/summer').replace(/^#\/?/, '');
+      // Smart back: drill UP the tree
+      const parent = {
+        'zion': 'summer',
+        'cards': 'zion', 'itinerary': 'zion', 'votes': 'zion',
+        'logistics': 'zion', 'budget': 'zion', 'packing': 'zion',
+        'day-1': 'itinerary', 'day-2': 'itinerary',
+        'day-3': 'itinerary', 'day-4': 'itinerary',
+        'bees': 'summer', 'brunch': 'summer', 'stars': 'summer',
+        'race': 'summer', 'craft': 'summer', 'rodeo': 'summer',
+        'concert': 'summer', 'coast': 'summer',
+        'pride': 'summer', 'vietnam': 'summer',
+        'memories': 'summer',
+        'memory-hike-may-9-2026': 'memories',
+        'memory-hockey-april-11-2026': 'memories',
+      };
+      go(parent[cur] || 'summer');
+      return;
+    }
+  });
+
+  window.addEventListener('hashchange', renderRoute);
+  renderRoute();
+
+  // ============================================================
+  //   ADD TO CALENDAR
+  // ============================================================
+  function fmtPretty(dt) {
+    // dt: "YYYYMMDDTHHMMSS" → e.g. "May 19, 2026 · 7:05 PM"
+    const y = +dt.slice(0,4), m = +dt.slice(4,6)-1, d = +dt.slice(6,8);
+    const h = +dt.slice(9,11), mn = +dt.slice(11,13);
+    const date = new Date(y, m, d, h, mn);
+    return date.toLocaleString('en-US', {
+      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+    });
+  }
+
+  function googleUrl(data) {
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: data.title,
+      dates: data.start + '/' + data.end,
+      details: data.description || '',
+      location: data.location || '',
+    });
+    return 'https://calendar.google.com/calendar/render?' + params.toString();
+  }
+
+  function icsBlob(data) {
+    // Use floating local time (no Z, no TZID) — calendars import as local.
+    const stamp = new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+    const uid = 'slcsix-' + data.start + '-' + Math.random().toString(36).slice(2,8) + '@slcsix';
+    const escape = (s) => (s || '').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+    const lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//The Group Chat: IRL//The Agenda//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      'UID:' + uid,
+      'DTSTAMP:' + stamp,
+      'DTSTART:' + data.start,
+      'DTEND:' + data.end,
+      'SUMMARY:' + escape(data.title),
+      'DESCRIPTION:' + escape(data.description),
+      'LOCATION:' + escape(data.location),
+      'END:VEVENT',
+      'END:VCALENDAR',
+      ''
+    ].join('\r\n');
+    return new Blob([lines], { type: 'text/calendar;charset=utf-8' });
+  }
+
+  function downloadIcs(data) {
+    const blob = icsBlob(data);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = data.title.replace(/[^\w\- ]+/g,'').replace(/\s+/g,'-').toLowerCase() + '.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 200);
+  }
+
+  const CAL_ICON = `<svg class="cal-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/></svg>`;
+  const CARET_ICON = `<svg class="cal-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
+  const GOOGLE_ICON = `<svg class="opt-ico" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="3" fill="#fff" stroke="#dadce0" stroke-width="1.2"/><text x="12" y="16" font-family="Arial, sans-serif" font-size="9" font-weight="700" text-anchor="middle" fill="#4285F4">31</text><path d="M8 2v3M16 2v3" stroke="#5f6368" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+  const APPLE_ICON = `<svg class="opt-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 3c.1 1-.3 2-.9 2.7-.6.8-1.6 1.4-2.6 1.3-.1-1 .4-2 .9-2.6.6-.8 1.7-1.4 2.6-1.4zM19 17.3c-.5 1.1-.8 1.6-1.4 2.6-.9 1.3-2.2 3-3.7 3-1.4 0-1.8-.9-3.7-.9s-2.4.9-3.7.9C5 22.9 3.8 21.4 2.9 20c-2.4-3.7-2.7-8-1.2-10.3 1-1.6 2.7-2.6 4.3-2.6 1.6 0 2.6.9 4 .9 1.3 0 2.1-.9 4-.9 1.4 0 2.9.8 4 2.1-3.5 1.9-3 6.9.0 8.1z"/></svg>`;
+  const COPY_ICON = `<svg class="opt-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>`;
+
+  function buildCalWidget(host) {
+    const data = {
+      title: host.dataset.calTitle || 'Event',
+      start: host.dataset.calStart,
+      end: host.dataset.calEnd,
+      location: host.dataset.calLocation || '',
+      description: host.dataset.calDescription || '',
+    };
+    if (!data.start || !data.end) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'cal-add';
+    wrap.innerHTML = `
+      <button class="cal-add__btn" type="button" aria-haspopup="menu" aria-expanded="false">
+        ${CAL_ICON}
+        <span>Add to calendar</span>
+        ${CARET_ICON}
+      </button>
+      <div class="cal-add__menu" role="menu">
+        <button type="button" data-cal-action="google" role="menuitem">
+          ${GOOGLE_ICON}
+          <span>
+            Google Calendar
+            <span class="sub">Opens in a new tab</span>
+          </span>
+        </button>
+        <button type="button" data-cal-action="ics" role="menuitem">
+          ${APPLE_ICON}
+          <span>
+            Apple / Outlook
+            <span class="sub">Downloads an .ics file</span>
+          </span>
+        </button>
+        <button type="button" data-cal-action="copy" role="menuitem">
+          ${COPY_ICON}
+          <span>
+            Copy event details
+            <span class="sub">Paste into a message</span>
+          </span>
+        </button>
+      </div>
+      <div class="cal-add__toast" aria-live="polite"></div>
+    `;
+    host.replaceWith(wrap);
+
+    const btn = wrap.querySelector('.cal-add__btn');
+    const menu = wrap.querySelector('.cal-add__menu');
+    const toast = wrap.querySelector('.cal-add__toast');
+
+    const setOpen = (open) => {
+      wrap.dataset.open = open ? 'true' : 'false';
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = wrap.dataset.open !== 'true';
+      // Close any other open widgets
+      document.querySelectorAll('.cal-add[data-open="true"]').forEach(w => {
+        if (w !== wrap) { w.dataset.open = 'false'; w.querySelector('.cal-add__btn').setAttribute('aria-expanded','false'); }
+      });
+      setOpen(open);
+    });
+
+    const showToast = (msg) => {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    };
+
+    menu.addEventListener('click', (e) => {
+      const opt = e.target.closest('[data-cal-action]');
+      if (!opt) return;
+      const action = opt.dataset.calAction;
+      if (action === 'google') {
+        window.open(googleUrl(data), '_blank', 'noopener');
+      } else if (action === 'ics') {
+        downloadIcs(data);
+      } else if (action === 'copy') {
+        const text = [
+          data.title,
+          fmtPretty(data.start) + ' – ' + fmtPretty(data.end),
+          data.location,
+          '',
+          data.description
+        ].filter(Boolean).join('\n');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(
+            () => showToast('Copied to clipboard'),
+            () => showToast('Couldn\'t copy')
+          );
+        } else {
+          showToast('Clipboard unavailable');
+        }
+      }
+      setOpen(false);
+    });
+  }
+
+  document.querySelectorAll('[data-cal="true"]').forEach(buildCalWidget);
+
+  // Close menus on outside click / escape
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.cal-add')) {
+      document.querySelectorAll('.cal-add[data-open="true"]').forEach(w => {
+        w.dataset.open = 'false';
+        w.querySelector('.cal-add__btn').setAttribute('aria-expanded','false');
+      });
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.cal-add[data-open="true"]').forEach(w => {
+        w.dataset.open = 'false';
+        w.querySelector('.cal-add__btn').setAttribute('aria-expanded','false');
+      });
+    }
+  });
+
+  // ============================================================
+  //   VOTES — radio behavior, persist in localStorage
+  // ============================================================
+  const STORAGE_KEY = "zion-trip-votes-v2";
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch (e) {}
+
+  document.querySelectorAll('[role="radiogroup"][data-vote]').forEach(group => {
+    const key = group.dataset.vote;
+    const items = [...group.querySelectorAll('[role="radio"]')];
+    let selectedIdx = -1;
+    if (key in saved) {
+      const idx = saved[key];
+      if (typeof idx === "number" && idx >= 0 && idx < items.length) selectedIdx = idx;
+    } else {
+      const di = items.findIndex(it => it.hasAttribute('data-default'));
+      if (di >= 0) selectedIdx = di;
+    }
+    items.forEach((it, i) => {
+      it.setAttribute('aria-checked', i === selectedIdx ? "true" : "false");
+      it.tabIndex = 0;
+      it.addEventListener('click', () => {
+        items.forEach((o, j) => o.setAttribute('aria-checked', i === j ? "true" : "false"));
+        saved[key] = i;
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(saved)); } catch (e) {}
+      });
+      it.addEventListener('keydown', e => {
+        if (e.key === " " || e.key === "Enter") { e.preventDefault(); it.click(); }
+      });
+    });
+  });
+</script>
+
+<script>
+  // Copy .ics link for the Subscribe panel
+  (function () {
+    const btn = document.getElementById('copyIcsBtn');
+    if (!btn) return;
+    const label = document.getElementById('copyIcsLabel');
+    const url = btn.dataset.ics;
+    const original = label.textContent;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (_) {}
+        document.body.removeChild(ta);
+      }
+      btn.classList.add('copied');
+      label.textContent = 'Copied — paste into Outlook → Add calendar from internet';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = original;
+      }, 2400);
+    });
+  })();
+</script>
+
+<script>
+  // ============================================================
+  //   MEMORIES — past-event photo galleries + Story generator
+  // ============================================================
+  // Photos live in Google Drive (public folders). We reference them by file ID
+  // and let lh3.googleusercontent.com serve resized JPGs (works for HEIC + PNG).
+  // To add a new memory: drop photos in the Drive folder, then add an entry below
+  // with the file IDs (find them in the Drive URL: /file/d/<ID>/view).
+  const MEMORIES = {
+    'hike-may-9-2026': {
+      title: 'Morning Hike',
+      subtitle: 'Donut Falls Trail',
+      date: '2026-05-09',
+      dateLabel: 'May 9, 2026',
+      catchphrase: 'Trail mix friends',
+      spotifyTrackId: null, // fill in once Spotify is connected — see souvenir band
+      driveFolder: 'https://drive.google.com/drive/folders/1aNOZC_xfnWHZUuzYVDQKvcKDmgxBfn5O',
+      coverId: '1ppVl_JA9gfRw4_1nYSjuD0WhZyGwpGhI',
+      media: [
+        { id: '1ppVl_JA9gfRw4_1nYSjuD0WhZyGwpGhI', type: 'photo' }, // IMG_7167.HEIC
+        { id: '1UWiQ64Pzt3scOQmpqWEX0nbfApTM-bVU', type: 'photo' }, // IMG_7181.HEIC
+        { id: '1AiLwnrXzcdhzV5Jff76hbkJUxTPeCyoC', type: 'photo' }, // IMG_7237.PNG
+        { id: '1F8cYe7i4yrejMrG6dSt7LS_BHJbwPxW2', type: 'photo' }, // IMG_7238.PNG
+        { id: '1gBQTGIyqS22qoY_FbXwAwgxSFk181ZPH', type: 'photo' }, // IMG_7239.PNG
+        { id: '1YgdsTxRmZn-gnqMrrr2T1aJxcyABWXDk', type: 'photo' }, // IMG_7240.PNG
+        { id: '1tTvw0dLZRwldKCT46C9-ZUbM6tvxoUTE', type: 'photo' }, // IMG_7241.PNG
+      ],
+    },
+    'hockey-april-11-2026': {
+      title: 'Grizzlies Hockey Night',
+      subtitle: 'Maverik Center · West Valley',
+      date: '2026-04-11',
+      dateLabel: 'April 11, 2026',
+      catchphrase: 'Penalty box energy',
+      spotifyTrackId: null,
+      driveFolder: 'https://drive.google.com/drive/folders/1URHfChv1OokfAbSPrdKrr1npxiD60K3e',
+      coverId: '1dS4PeO0ULrbMVGeD35i17KTqTqYX9Q_P',
+      media: [
+        { id: '1dS4PeO0ULrbMVGeD35i17KTqTqYX9Q_P', type: 'photo' }, // IMG_7162.HEIC (cover)
+        { id: '19S46z3YKS-IgzHbLIs4bXTt3KVjvD5s_', type: 'photo' }, // IMG_7155.HEIC
+        { id: '1ZQcCiYLtswkpfkGqclZp27vB-QFwRjEm', type: 'photo' }, // IMG_7156.HEIC
+        { id: '17JHUfZAbpud2WZ5x7UwqAd9sP6AyLzhb', type: 'video' }, // IMG_7154.mov
+      ],
+    },
+  };
+
+  // Drive URL helpers — lh3 serves rendered preview images at any size
+  // (works for HEIC + PNG, supports CORS for canvas use).
+  // For videos, lh3 returns a poster frame; use /preview for inline playback.
+  const drivePhoto = (id, size = 1600) => `https://lh3.googleusercontent.com/d/${id}=w${size}`;
+  const driveThumb = (id, size = 1600) => `https://drive.google.com/thumbnail?id=${id}&sz=w${size}`;
+  const driveDownload = (id) => `https://drive.google.com/uc?export=download&id=${id}`;
+  const driveVideoPreview = (id) => `https://drive.google.com/file/d/${id}/preview`;
+
+  // --- Grid rendering ---
+  function renderMemoriesGrid() {
+    const grid = document.getElementById('memoriesGrid');
+    const empty = document.getElementById('memoriesEmpty');
+    const count = document.getElementById('memoriesCount');
+    if (!grid) return;
+
+    const today = new Date();
+    const past = Object.entries(MEMORIES)
+      .filter(([, m]) => new Date(m.date) <= today)
+      .sort(([, a], [, b]) => new Date(b.date) - new Date(a.date));
+
+    count.textContent = past.length === 1 ? '1 event · captured' : past.length + ' events · captured';
+
+    if (past.length === 0) {
+      grid.hidden = true; empty.hidden = false; return;
+    }
+    grid.hidden = false; empty.hidden = true;
+
+    grid.innerHTML = past.map(([key, m]) => {
+      const photoN = m.media.filter(x => x.type === 'photo').length;
+      const videoN = m.media.filter(x => x.type === 'video').length;
+      const countLabel = [
+        photoN ? `${photoN} ${photoN === 1 ? 'photo' : 'photos'}` : '',
+        videoN ? `${videoN} ${videoN === 1 ? 'video' : 'videos'}` : '',
+      ].filter(Boolean).join(' · ');
+      return `
+      <div class="memory-card" data-go="memory-${key}">
+        <div class="cover" style="background-image:url('${drivePhoto(m.coverId, 1200)}')">
+          <span class="pill">${m.dateLabel}</span>
+          <span class="count">${countLabel}</span>
+        </div>
+        <div class="body">
+          <h3>${escapeHtml(m.title)}</h3>
+          <div class="sub">${escapeHtml(m.subtitle)}</div>
+          <div class="foot"><span>Open gallery</span><span class="arrow">→</span></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // --- Detail rendering ---
+  let currentMemoryKey = null;
+  function renderMemoryDetail(key) {
+    const m = MEMORIES[key];
+    if (!m) return;
+    currentMemoryKey = key;
+    const photoN = m.media.filter(x => x.type === 'photo').length;
+    const videoN = m.media.filter(x => x.type === 'video').length;
+    const eyebrowParts = [m.dateLabel];
+    if (photoN) eyebrowParts.push(`${photoN} ${photoN === 1 ? 'photo' : 'photos'}`);
+    if (videoN) eyebrowParts.push(`${videoN} ${videoN === 1 ? 'video' : 'videos'}`);
+
+    document.getElementById('memHeroBg').style.backgroundImage = `url('${drivePhoto(m.coverId, 1600)}')`;
+    document.getElementById('memEyebrow').textContent = eyebrowParts.join(' · ');
+    document.getElementById('memTitle').textContent = m.title;
+    document.getElementById('memSub').textContent = m.subtitle;
+    document.getElementById('memGallery').innerHTML = m.media.map((item, i) => {
+      const isVideo = item.type === 'video';
+      // For videos, lh3 returns a poster frame at the same URL pattern.
+      const thumbUrl = drivePhoto(item.id, 800);
+      return `
+      <div class="gallery-photo ${isVideo ? 'is-video' : ''}" style="background-image:url('${thumbUrl}')" data-photo-id="${item.id}" data-type="${item.type}" data-idx="${i}" role="button" aria-label="Open ${item.type} ${i+1}">
+        ${isVideo ? '<span class="vid-tag">Video</span>' : ''}
+      </div>`;
+    }).join('');
+
+    // Souvenir band: song + sticker
+    renderSong(m);
+    drawSticker(m).catch(err => console.warn('Sticker render failed', err));
+  }
+
+  // --- Souvenir: Spotify embed + procedural sticker ---
+  function renderSong(memory) {
+    const host = document.getElementById('memSongHost');
+    if (!host) return;
+    if (memory.spotifyTrackId) {
+      host.innerHTML = `<iframe class="spotify-embed" src="https://open.spotify.com/embed/track/${memory.spotifyTrackId}?utm_source=cowork" loading="lazy" allow="encrypted-media; autoplay; clipboard-write; fullscreen; picture-in-picture"></iframe>`;
+    } else {
+      host.innerHTML = `
+        <div class="empty">
+          <div class="icon">🎵</div>
+          <div>The soundtrack lands once Spotify is connected.</div>
+          <div class="hint">Pick coming soon</div>
+        </div>`;
+    }
+  }
+
+  function drawRoundedRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  async function drawSticker(memory) {
+    const canvas = document.getElementById('memSticker');
+    if (!canvas) return;
+    try {
+      await document.fonts.load('italic 76px "Cormorant Garamond"');
+      await document.fonts.load('700 14px "Manrope"');
+      await document.fonts.ready;
+    } catch (e) { /* font load best-effort */ }
+
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;   // 720
+    const H = canvas.height;  // 880
+    ctx.clearRect(0, 0, W, H);
+
+    // Polaroid card with drop shadow
+    const cardPad = 24;
+    const cardX = cardPad, cardY = cardPad;
+    const cardW = W - cardPad * 2, cardH = H - cardPad * 2;
+    const radius = 22;
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.22)';
+    ctx.shadowBlur = 36;
+    ctx.shadowOffsetY = 14;
+    drawRoundedRect(ctx, cardX, cardY, cardW, cardH, radius);
+    ctx.fillStyle = '#fefcf7'; // warm off-white
+    ctx.fill();
+    ctx.restore();
+
+    // Photo inset
+    const photoSize = cardW - 64; // 32 padding each side
+    const photoX = cardX + 32, photoY = cardY + 32;
+
+    let img;
+    try {
+      img = await loadImage(drivePhoto(memory.coverId, 1200), true);
+    } catch (e) {
+      // If image fails, just leave the card empty with text
+      img = null;
+    }
+
+    if (img) {
+      const scale = Math.max(photoSize / img.width, photoSize / img.height);
+      const dw = img.width * scale, dh = img.height * scale;
+      const dx = photoX + (photoSize - dw) / 2;
+      const dy = photoY + (photoSize - dh) / 2;
+      ctx.save();
+      drawRoundedRect(ctx, photoX, photoY, photoSize, photoSize, 10);
+      ctx.clip();
+      ctx.drawImage(img, dx, dy, dw, dh);
+      ctx.restore();
+    } else {
+      // Placeholder block
+      ctx.save();
+      drawRoundedRect(ctx, photoX, photoY, photoSize, photoSize, 10);
+      ctx.fillStyle = '#e9e1d3';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Catchphrase — italic Cormorant, centered, may wrap
+    const captionY = photoY + photoSize + 78;
+    ctx.fillStyle = '#0a0a0a';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+
+    // Auto-fit caption: shrink font if needed to one line
+    let captionSize = 76;
+    ctx.font = `italic 400 ${captionSize}px "Cormorant Garamond", serif`;
+    while (ctx.measureText(memory.catchphrase).width > cardW - 100 && captionSize > 44) {
+      captionSize -= 4;
+      ctx.font = `italic 400 ${captionSize}px "Cormorant Garamond", serif`;
+    }
+    ctx.fillText(memory.catchphrase, W / 2, captionY);
+
+    // Date — small uppercase Manrope
+    ctx.font = '700 18px "Manrope", system-ui, sans-serif';
+    ctx.fillStyle = '#5c5c62';
+    ctx.fillText(spaceLetters(memory.dateLabel.toUpperCase(), 2), W / 2, captionY + 46);
+
+    // Brand mark
+    ctx.font = '700 12px "Manrope", system-ui, sans-serif';
+    ctx.fillStyle = '#9a9aa1';
+    ctx.fillText(spaceLetters('THE GROUP CHAT: IRL ✨', 2), W / 2, captionY + 76);
+  }
+
+  // Download sticker
+  document.getElementById('memStickerDownload').addEventListener('click', () => {
+    const canvas = document.getElementById('memSticker');
+    const btn = document.getElementById('memStickerDownload');
+    const label = document.getElementById('memStickerDownloadLabel');
+    const filename = `group-chat-irl_${currentMemoryKey || 'memory'}_sticker.png`;
+    try {
+      canvas.toBlob(blob => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        btn.classList.add('copied');
+        const orig = label.textContent;
+        label.textContent = 'Downloaded ✓';
+        setTimeout(() => { btn.classList.remove('copied'); label.textContent = orig; }, 1800);
+      }, 'image/png');
+    } catch (e) {
+      alert('Download blocked. Serve the site over http (python -m http.server) and try again.');
+    }
+  });
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
+  // --- Routing hook: react to hash changes for memory routes ---
+  function handleMemoryRoute() {
+    const raw = (window.location.hash || '#/summer').replace(/^#\/?/, '');
+    if (raw === 'memories') {
+      renderMemoriesGrid();
+    } else if (raw.startsWith('memory-')) {
+      renderMemoryDetail(raw.replace(/^memory-/, ''));
+    }
+  }
+  window.addEventListener('hashchange', handleMemoryRoute);
+  // initial — render grid even if we're on summer, so re-entry is instant
+  renderMemoriesGrid();
+  handleMemoryRoute();
+
+  // --- Lightbox ---
+  const lightbox = document.getElementById('lightbox');
+  const lbStage = document.getElementById('lbStage');
+  const lbTitle = document.getElementById('lbTitle');
+  const lbDate = document.getElementById('lbDate');
+  const lbSave = document.getElementById('lbSave');
+  const lbSaveLabel = document.getElementById('lbSaveLabel');
+  const lbStoryBtn = document.getElementById('lbStory');
+  let currentPhotoId = null;
+  let currentPhotoIdx = 0;
+  let currentPhotoType = 'photo';
+
+  function openLightbox(id, idx, type) {
+    if (!currentMemoryKey) return;
+    const m = MEMORIES[currentMemoryKey];
+    currentPhotoId = id;
+    currentPhotoIdx = idx;
+    currentPhotoType = type || 'photo';
+
+    // Clear and populate the stage based on media type
+    lbStage.innerHTML = '';
+    if (currentPhotoType === 'video') {
+      const iframe = document.createElement('iframe');
+      iframe.src = driveVideoPreview(id);
+      iframe.allow = 'autoplay; fullscreen';
+      iframe.allowFullscreen = true;
+      iframe.setAttribute('frameborder', '0');
+      lbStage.appendChild(iframe);
+      lbSaveLabel.textContent = 'Save video';
+      lbSave.download = `${currentMemoryKey}_${String(idx + 1).padStart(2,'0')}.mov`;
+      lbStoryBtn.style.display = 'none';
+    } else {
+      const img = document.createElement('img');
+      img.id = 'lbImg';
+      img.src = drivePhoto(id, 2400);
+      img.alt = m.title + ' — ' + m.dateLabel;
+      lbStage.appendChild(img);
+      lbSaveLabel.textContent = 'Save photo';
+      lbSave.download = `${currentMemoryKey}_${String(idx + 1).padStart(2,'0')}.jpg`;
+      lbStoryBtn.style.display = '';
+    }
+
+    lbTitle.textContent = m.title;
+    lbDate.textContent = m.dateLabel;
+    lbSave.href = driveDownload(id);
+    lightbox.classList.add('active');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lightbox.classList.remove('active');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    // Stop any playing video by clearing the iframe
+    if (currentPhotoType === 'video') lbStage.innerHTML = '';
+  }
+
+  document.getElementById('memGallery').addEventListener('click', e => {
+    const tile = e.target.closest('.gallery-photo');
+    if (tile) openLightbox(tile.dataset.photoId, parseInt(tile.dataset.idx, 10) || 0, tile.dataset.type);
+  });
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (storyModal.classList.contains('active')) closeStory();
+      else if (lightbox.classList.contains('active')) closeLightbox();
+    }
+  });
+
+  // --- Story (9:16) canvas generator ---
+  const storyModal = document.getElementById('storyModal');
+  const storyCanvas = document.getElementById('storyCanvas');
+  const smDownload = document.getElementById('smDownload');
+  const smClose = document.getElementById('smClose');
+
+  document.getElementById('lbStory').addEventListener('click', async () => {
+    if (!currentPhotoId || !currentMemoryKey || currentPhotoType === 'video') return;
+    storyModal.classList.add('active');
+    storyModal.setAttribute('aria-hidden', 'false');
+    await drawStory(currentPhotoId, MEMORIES[currentMemoryKey]);
+  });
+  smClose.addEventListener('click', closeStory);
+  storyModal.addEventListener('click', e => { if (e.target === storyModal) closeStory(); });
+  function closeStory() {
+    storyModal.classList.remove('active');
+    storyModal.setAttribute('aria-hidden', 'true');
+  }
+
+  function loadImage(src, cors) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      // crossOrigin is needed when the image is pulled from another origin
+      // (e.g. Google Drive's lh3 CDN) AND we want to read pixels via canvas.
+      if (cors) img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  async function drawStory(photoId, memory) {
+    const photoSrc = drivePhoto(photoId, 1600);
+    // Ensure Cormorant Garamond is loaded before drawing text
+    try {
+      await document.fonts.load('italic 96px "Cormorant Garamond"');
+      await document.fonts.load('600 28px "Manrope"');
+      await document.fonts.ready;
+    } catch (e) { /* font load best-effort */ }
+
+    const ctx = storyCanvas.getContext('2d');
+    const W = storyCanvas.width;   // 1080
+    const H = storyCanvas.height;  // 1920
+
+    ctx.clearRect(0, 0, W, H);
+
+    const img = await loadImage(photoSrc, true);
+
+    // Cover-crop the photo into the full canvas
+    const scale = Math.max(W / img.width, H / img.height);
+    const dw = img.width * scale;
+    const dh = img.height * scale;
+    const dx = (W - dw) / 2;
+    const dy = (H - dh) / 2;
+    ctx.drawImage(img, dx, dy, dw, dh);
+
+    // Bottom gradient for text legibility
+    const grad = ctx.createLinearGradient(0, H * 0.55, 0, H);
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(1, 'rgba(0,0,0,0.78)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Title (Cormorant italic) — wraps if too long
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+
+    const padX = 72;
+    const baseY = H - 220;
+
+    const titleSize = 96;
+    ctx.font = `italic 400 ${titleSize}px "Cormorant Garamond", serif`;
+    const titleLines = wrapText(ctx, memory.title, W - padX * 2);
+    let titleY = baseY - (titleLines.length - 1) * titleSize * 1.02;
+    titleLines.forEach((line, i) => {
+      ctx.fillText(line, padX, titleY + i * titleSize * 1.02);
+    });
+
+    // Subtitle (Manrope semibold uppercase)
+    ctx.font = '600 28px "Manrope", system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.78)';
+    const subText = memory.subtitle.toUpperCase();
+    ctx.letterSpacing = '4px';  // not all browsers support; we space manually
+    ctx.fillText(spaceLetters(subText, 4), padX, baseY + 50);
+
+    // Date (Cormorant italic)
+    ctx.font = 'italic 400 38px "Cormorant Garamond", serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.88)';
+    ctx.fillText(memory.dateLabel, padX, baseY + 110);
+
+    // Brand mark (bottom)
+    ctx.font = '700 22px "Manrope", system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillText(spaceLetters('THE GROUP CHAT: IRL ✨', 2), padX, H - 64);
+  }
+
+  function wrapText(ctx, text, maxWidth) {
+    const words = text.split(' ');
+    const lines = [];
+    let line = '';
+    for (const word of words) {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function spaceLetters(s, spacePx) {
+    // letter-spacing fallback: insert thin spaces
+    return s.split('').join(' ');
+  }
+
+  smDownload.addEventListener('click', () => {
+    const safeKey = currentMemoryKey || 'memory';
+    const filename = `group-chat-irl_${safeKey}_story.jpg`;
+    try {
+      storyCanvas.toBlob(blob => {
+        if (!blob) return fallbackDownload(safeKey, filename);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }, 'image/jpeg', 0.92);
+    } catch (e) {
+      fallbackDownload(safeKey, filename);
+    }
+  });
+  function fallbackDownload(key, filename) {
+    // If toBlob fails (canvas tainted, usually file:// origin), open
+    // the canvas in a new tab so user can right-click → save.
+    try {
+      const dataUrl = storyCanvas.toDataURL('image/jpeg', 0.92);
+      const w = window.open();
+      w.document.write(`<title>${filename}</title><img src="${dataUrl}" style="max-width:100%;display:block;margin:0 auto;">`);
+    } catch (e) {
+      alert('Download blocked when opening the file directly. Serve the site over http (e.g. `python -m http.server`) and try again.');
+    }
+  }
+</script>
+
+</body>
+</html>

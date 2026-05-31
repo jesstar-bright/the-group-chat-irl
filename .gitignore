@@ -1,0 +1,6 @@
+# Private analytics page — keep out of the public site.
+# Open it locally to view crew stats; never served to visitors.
+dashboard.html
+
+# OS cruft
+.DS_Store
