@@ -13,7 +13,7 @@
    a real, working per-device demo you can click through today.
    ============================================================ */
 (function () {
-  const ENDPOINT = ''; // ← paste your Apps Script /exec URL here to go live
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwHsieuiHlCqXzW3m4ja6bN2VjkJl2A4Z3H57Ed7erX5P8GpTL2bRxZSp-hZrc2tmIw1g/exec'; // ← Apps Script web app (Group Chat IRL — hits sheet)
   const LS_KEY = 'gc_irl_hits_v1';
   const SID_KEY = 'gc_irl_sid';
 
