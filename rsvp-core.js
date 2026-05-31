@@ -30,8 +30,31 @@
     return /^https:\/\//i.test(s);
   }
 
+  function firstName(name) {
+    var s = sanitizeName(name);
+    return s ? s.split(' ')[0] : '';
+  }
+
+  function b64urlDecode(str) {
+    var s = String(str).replace(/-/g, '+').replace(/_/g, '/');
+    var pad = s.length % 4 ? '='.repeat(4 - (s.length % 4)) : '';
+    s = s + pad;
+    if (typeof Buffer !== 'undefined') return Buffer.from(s, 'base64').toString('utf8');
+    return decodeURIComponent(escape(atob(s))); // browser, UTF-8 safe
+  }
+
+  function decodeIdToken(jwt) {
+    try {
+      var parts = String(jwt == null ? '' : jwt).split('.');
+      if (parts.length < 2 || !parts[1]) return null;
+      var p = JSON.parse(b64urlDecode(parts[1]));
+      return { name: p.name || '', picture: p.picture || '', email: p.email || '' };
+    } catch (e) { return null; }
+  }
+
   var RSVPCore = { COLORS: COLORS, initials: initials, colorFor: colorFor,
-    sanitizeName: sanitizeName, isValidPhotoUrl: isValidPhotoUrl };
+    sanitizeName: sanitizeName, isValidPhotoUrl: isValidPhotoUrl,
+    firstName: firstName, decodeIdToken: decodeIdToken };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = RSVPCore;
   if (root) root.RSVPCore = RSVPCore;

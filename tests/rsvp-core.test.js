@@ -35,3 +35,24 @@ test('isValidPhotoUrl: only https, <=200 chars, no spaces', () => {
   assert.strictEqual(C.isValidPhotoUrl('https://x.com/' + 'a'.repeat(220)), false);
   assert.strictEqual(C.isValidPhotoUrl(''), false);
 });
+
+test('firstName: first token, sanitized', () => {
+  assert.strictEqual(C.firstName('Gaby Hernandez'), 'Gaby');
+  assert.strictEqual(C.firstName('  Sam  '), 'Sam');
+  assert.strictEqual(C.firstName(''), '');
+});
+
+test('decodeIdToken: reads name/picture/email from JWT payload', () => {
+  // payload {"name":"Gaby","picture":"https://x/p.png","email":"g@x.com"}
+  const payload = Buffer.from(JSON.stringify({
+    name: 'Gaby', picture: 'https://x/p.png', email: 'g@x.com'
+  })).toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+  const jwt = 'header.' + payload + '.sig';
+  assert.deepStrictEqual(C.decodeIdToken(jwt), { name: 'Gaby', picture: 'https://x/p.png', email: 'g@x.com' });
+});
+
+test('decodeIdToken: malformed -> null', () => {
+  assert.strictEqual(C.decodeIdToken('not-a-jwt'), null);
+  assert.strictEqual(C.decodeIdToken(''), null);
+  assert.strictEqual(C.decodeIdToken(null), null);
+});
