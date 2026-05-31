@@ -240,7 +240,7 @@ Append to `tests/rsvp-core.test.js`:
 ```js
 test('sanitizeName: trims, collapses spaces, strips <> and control chars, caps 50', () => {
   assert.strictEqual(C.sanitizeName('  Sam  '), 'Sam');
-  assert.strictEqual(C.sanitizeName('a b<c>d'), 'abcd');
+  assert.strictEqual(C.sanitizeName('a b<c>d'), 'a bcd');
   assert.strictEqual(C.sanitizeName('Mary   Jane'), 'Mary Jane');
   assert.strictEqual(C.sanitizeName('x'.repeat(80)).length, 50);
   assert.strictEqual(C.sanitizeName(null), '');
@@ -268,7 +268,7 @@ In `rsvp-core.js`, add these two functions above the `var RSVPCore = ...` line:
 ```js
   function sanitizeName(name) {
     var s = String(name == null ? '' : name);
-    s = s.replace(/[ -<>]/g, '');
+    s = s.replace(/[\x00-\x1F<>]/g, ''); // control chars + angle brackets
     s = s.replace(/\s+/g, ' ').trim();
     return s.slice(0, 50);
   }
@@ -761,7 +761,7 @@ function doPost(e) {
 }
 
 function sanitizeName_(v) {
-  return String(v == null ? '' : v).replace(/[ -<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 50);
+  return String(v == null ? '' : v).replace(/[\x00-\x1F<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 50);
 }
 function validPhoto_(v) {
   const s = String(v || '').trim();
