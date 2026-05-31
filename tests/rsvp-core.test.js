@@ -56,3 +56,21 @@ test('decodeIdToken: malformed -> null', () => {
   assert.strictEqual(C.decodeIdToken(''), null);
   assert.strictEqual(C.decodeIdToken(null), null);
 });
+
+test('dedupeRoster: latest state per (event,device), only "in", first-name + valid photo', () => {
+  const rows = [
+    { event_id: 'pride', device_id: 'd1', name: 'Sam Lee', photo: 'https://x/p.png', state: 'in', t: 1 },
+    { event_id: 'pride', device_id: 'd1', name: 'Sam Lee', photo: '', state: 'out', t: 2 }, // d1 left
+    { event_id: 'pride', device_id: 'd2', name: 'Gaby', photo: 'http://bad', state: 'in', t: 1 }, // bad photo -> ''
+    { event_id: 'bees', device_id: 'd3', name: 'Kate Smith', photo: '', state: 'in', t: 5 },
+  ];
+  assert.deepStrictEqual(C.dedupeRoster(rows), {
+    pride: [{ name: 'Gaby', photo: '' }],
+    bees: [{ name: 'Kate', photo: '' }],
+  });
+});
+
+test('dedupeRoster: empty/garbage -> {}', () => {
+  assert.deepStrictEqual(C.dedupeRoster([]), {});
+  assert.deepStrictEqual(C.dedupeRoster(null), {});
+});

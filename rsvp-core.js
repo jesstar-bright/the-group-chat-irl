@@ -52,9 +52,29 @@
     } catch (e) { return null; }
   }
 
+  function dedupeRoster(rows) {
+    var latest = {};
+    (rows || []).forEach(function (r) {
+      var k = r.event_id + '|' + r.device_id;
+      if (!latest[k] || (r.t || 0) >= (latest[k].t || 0)) latest[k] = r;
+    });
+    var out = {};
+    Object.keys(latest).forEach(function (k) {
+      var r = latest[k];
+      if (r.state !== 'in') return;
+      var nm = firstName(r.name);
+      if (!r.event_id || !nm) return;
+      (out[r.event_id] = out[r.event_id] || []).push({
+        name: nm, photo: isValidPhotoUrl(r.photo) ? r.photo : ''
+      });
+    });
+    return out;
+  }
+
   var RSVPCore = { COLORS: COLORS, initials: initials, colorFor: colorFor,
     sanitizeName: sanitizeName, isValidPhotoUrl: isValidPhotoUrl,
-    firstName: firstName, decodeIdToken: decodeIdToken };
+    firstName: firstName, decodeIdToken: decodeIdToken,
+    dedupeRoster: dedupeRoster };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = RSVPCore;
   if (root) root.RSVPCore = RSVPCore;
