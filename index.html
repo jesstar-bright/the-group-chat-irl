@@ -31,9 +31,14 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
+<!-- RSVP: Google sign-in client id (paste your OAuth Web Client ID; '' = name-only) -->
+<script>window.GC_GOOGLE_CLIENT_ID = '';</script>
+<script src="https://accounts.google.com/gsi/client" async></script>
 <script src="data.js"></script>
 <script src="track.js"></script>
+<script src="rsvp-core.js"></script>
 <script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="rsvp.jsx"></script>
 <script type="text/babel" src="app.jsx"></script>
 </body>
 </html>
