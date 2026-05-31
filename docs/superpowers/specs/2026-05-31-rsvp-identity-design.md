@@ -90,7 +90,7 @@ Columns: `event_id · device_id · name · photo · state · t`
 3. **Avatar** renders the **photo if present, else colored initials** (first letter of `name`, deterministic color).
 4. **"You're in ✓"** (tap again) → `state='out'`, removes you from the roster. This is also the opt-out.
 
-**Trust model (explicit, accepted):** the Google ID token is **not** cryptographically verified — we only read `name`/`picture` to decorate an avatar. The worst case (a spoofed name/photo) is identical to the risk of someone typing a fake name. Server-side verification is unnecessary complexity for this use (YAGNI).
+**Trust model (explicit, accepted):** the Google ID token is **not** cryptographically verified in the initial implementation — we only read `name`/`picture` to decorate an avatar. The worst case (a spoofed name/photo) is identical to the risk of someone typing a fake name. Server-side verification is not required for launch (YAGNI) but can be added later for higher assurance.
 
 ---
 
@@ -105,7 +105,7 @@ All three live in the `EventDetail` component's "whoin" block (currently around 
 > **Re-apply checklist (after any `app.jsx` re-export from claude.ai/design):**
 > `grep -n "friends are in" app.jsx` to find the whoin block, then re-apply the 3 edits above. The spec's "before/after" snippets are the source of truth. `RSVPFaces`/`RSVPCount` and the generic home-page `<Faces />` are intentionally left alone — only the event-detail whoin block changes.
 
-The generic `<Faces />` on the Home carousel cards stays as-is (decorative); only the event-detail page shows real rosters. (Future enhancement, out of scope: real counts on cards.)
+The generic `<Faces />` on the Home carousel cards stays as-is (decorative); only the event-detail page shows real rosters.
 
 ---
 
@@ -140,6 +140,48 @@ Babel-in-browser is intentionally retained (keeps the design workflow simple). N
 - **Apps Script endpoints:** manual `curl` verification (Apps Script can't be unit-tested locally) — POST an `in` then `out`, GET `?mode=rsvps`, confirm the row upserts and that the response contains no `device_id` and no `Sheet1` data. Steps documented in `BACKEND-SETUP.md`.
 - **Manual smoke:** serve locally, tap "I'm in," confirm name sheet → optimistic avatar → count increments; confirm tap-again removes.
 
+- **Playwright E2E:** Add a small suite of Playwright tests to validate the full RSVP flow (load, tap "I'm in", name prompt, optimistic UI, POST payload, and final roster/count). Tests should mock the Apps Script endpoints for deterministic runs and also include one end-to-end run against a deployed test site.
+
+  - Install (dev):
+
+    ```bash
+    npm install -D @playwright/test
+    npx playwright install
+    ```
+
+  - Run locally:
+
+    ```bash
+    npx playwright test
+    ```
+
+  - Minimal example test (`tests/rsvp.spec.js`):
+
+    ```javascript
+    import { test, expect } from '@playwright/test';
+
+    test('RSVP flow increments count', async ({ page }) => {
+      // Mock roster GET -> empty initially
+      await page.route('**/exec?mode=rsvps', route =>
+        route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) })
+      );
+      // Mock POST upsert to succeed
+      await page.route('**/exec', route =>
+        route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) })
+      );
+
+      await page.goto('http://localhost:3000'); // change to your dev URL
+      await page.click('text=I\\'m in'); // adapt selector if needed
+      await page.fill('input[name="name"]', 'Sam'); // adapt selector to your prompt
+      await page.click('text=Confirm'); // adapt label
+      await expect(page.locator('.rsvp-count')).toContainText('1 friends are in');
+    });
+    ```
+
+  - CI: add a job to run `npm ci`, `npx playwright install --with-deps`, then `npx playwright test` (run headless). Use route mocking for unit CI; optionally run a job against a staging deployment for a true end-to-end smoke.
+
+  - Notes: assert POST payloads via Playwright `route.continue()`/`route.request()` when you want to verify what the client sent; use `page.route()` to simulate backend errors and exercise error-handling paths.
+
 ---
 
 ## 10. Setup tasks owned by Jessica (like the calendar key)
@@ -158,12 +200,140 @@ Babel-in-browser is intentionally retained (keeps the design workflow simple). N
 
 ---
 
-## 12. Out of scope (YAGNI)
+## 12. Security & abuse mitigations
 
-Explicitly **not** building: maybe/no responses (just in/out), comments or chat on events, editing someone else's RSVP, server-side token verification, realtime live updates (fetch-on-load + refresh-on-action suffices at friend scale), "who came" rosters on past Memories, and real counts on the Home carousel cards.
+Minimal, practical protections to add before wide public use. These are intentionally lightweight so they fit the current Apps Script + Sheets infra.
+
+- **Server-side validation & sanitization (Apps Script):**
+  - Reject POSTs missing required fields: `event`, `sid`, `name`.
+  - Trim and normalize `name`; reject if empty after trim.
+  - Enforce field length limits: `name` ≤ 50 chars, `photo` URL ≤ 200 chars, `event_id` ≤ 100 chars, `device_id`/`sid` ≤ 128 chars.
+  - Disallow control characters and HTML angle-brackets in `name` (strip or reject `<`, `>`, null bytes).
+  - Accept `photo` only if it starts with `https://` and reject `javascript:`, `data:`, `file:` schemes.
+
+- **Rate limiting & simple abuse heuristics:**
+  - Per-`sid` write throttling (example: max 10 writes per hour) enforced in Apps Script.
+  - Reject or flag sudden bursts of new unique names from a single `sid` or IP.
+
+- **Google ID token handling:**
+  - Prefer server-side verification of GIS ID tokens when persisting `picture` claims (call Google's tokeninfo or verify JWT signatures) for stronger assurance. This is optional for the initial launch; if verification is not performed, treat photos as unverified and display a small "unverified" affordance or avoid trusting them for actions.
+
+- **Output minimization & privacy:**
+  - Public `?mode=rsvps` should only include `name` and `photo` (no `sid`, no timestamps, no raw tokens).
+  - Keep names first-name-only in the UI; if users supply longer names, store them but slice/format the public output.
+
+- **Client-side safety:**
+  - Render all user-supplied text via React (automatic escaping); never use `dangerouslySetInnerHTML` with raw input.
+  - Validate inputs on the client (length, simple charset) before POSTing.
+
+- **Hosting & transport:**
+  - Keep the Apps Script `Execute as` set to the script owner; choose `Who has access` deliberately (if the public page must fetch without auth, use “Anyone, even anonymous”, understanding the trade-off).
+  - Use SRI for third-party scripts and add a Content Security Policy on the static site to limit allowed `script-src`/`connect-src`.
+
+- **Logging, moderation & recovery:**
+  - Add an admin-only view to remove abusive RSVP rows (or mark them `state='banned'`).
+  - Log suspicious writes in a separate admin sheet or append an `audit` column.
+
+- **Optional stronger mitigations (if abuse occurs):**
+  - Add CAPTCHA (reCAPTCHA) for POSTs.
+  - Require server-side ID token verification for photos.
+  - Use short-lived event tokens or organizer-only write keys for private events.
+
+Add these checks to `BACKEND-SETUP.md` as a mandatory step before production deployment; include example `curl` tests that assert rejection of malformed inputs.
+
+## 13. Data collection & retention (Appendix)
+
+Principles
+- Minimize PII: default to anonymous `sid` and aggregates; collect names/photos only when explicitly needed for the roster and with consent.
+- Purposeful collection: each field must map to a product question (analytics, reliability, or moderation).
+- Short retention for raw rows; store long-term aggregates only.
+
+Recommended analytics signals (low risk)
+- Event actions (append-only rows): `t · sid · event_id · action · page · label` where `action` ∈ {`view`,`rsvp_prompt`,`rsvp_in`,`rsvp_out`,`share`}.
+- Session summary (daily): `date · sid_hash · session_start · session_seconds · pages · clicks · device_category · locale` (keep `sid_hash` not raw `sid`).
+- Performance & errors: `t · sid_hash · page · metric_name · value` and `t · sid_hash · error_hash · message_snippet` (error_snippets should be hashed/truncated to avoid PII).
+
+Fields to avoid or protect
+- Emails, full OAuth tokens, raw IP addresses, precise geolocation, or persistent device fingerprints.
+- Names/photos: keep in `RSVPs` only and publish only first-name or initials on public APIs.
+
+Retention & aggregation policy (suggested)
+- Raw analytics rows: keep 30 days, then delete or truncate to reduce PII surface.
+- Aggregates (daily/weekly summaries): keep 2 years for product analysis.
+- Audit logs (admin removal actions): keep 90 days.
+
+Analytics sheet schema (Sheets)
+- `Analytics` tab (append-only): `t · sid_hash · event_id · action · page · label · locale · device · referrer`.
+- `DailyAggregates` tab: `date · event_id · rsvp_in_count · rsvp_out_count · unique_sids` (computed by script or formulas).
+
+Sample Apps Script: append validated analytics row + daily aggregate roll-up
+
+```javascript
+// Call this from client POSTs to record analytics (lightweight validation)
+function appendAnalyticsRow(payload) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Analytics');
+  if (!sheet) sheet = ss.insertSheet('Analytics');
+  var now = (new Date()).toISOString();
+
+  // Basic validation and trimming
+  var sid = String(payload.sid || '').trim();
+  var sidHash = sid ? Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, sid + (PropertiesService.getScriptProperties().getProperty('PEPPER')||'')) : '';
+  var eventId = String(payload.event_id || payload.event || '').slice(0,100);
+  var action = String(payload.action || '').slice(0,50);
+  var page = String(payload.page || '').slice(0,100);
+  var label = String(payload.label || '').slice(0,200);
+  var locale = String(payload.locale || '').slice(0,20);
+  var device = String(payload.device || '').slice(0,50);
+  var referrer = String(payload.referrer || '').slice(0,200);
+
+  if (!eventId || !action) return { ok: false, reason: 'missing event or action' };
+
+  sheet.appendRow([ now, Utilities.base64Encode(sidHash), eventId, action, page, label, locale, device, referrer ]);
+  return { ok: true };
+}
+
+// Simple daily aggregate job (run once a day via time-driven trigger)
+function rollDailyAggregates() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var analytics = ss.getSheetByName('Analytics');
+  if (!analytics) return;
+  var data = analytics.getDataRange().getValues();
+  var header = data.shift();
+  var idx = {}; header.forEach(function(h,i){ idx[h]=i; });
+  var groups = {};
+  data.forEach(function(r){
+    var t = r[0];
+    var eventId = r[2]||'';
+    var action = r[3]||'';
+    var date = (new Date(t)).toISOString().slice(0,10);
+    var key = date+'|'+eventId;
+    groups[key] = groups[key] || { date: date, event: eventId, rsvp_in:0, rsvp_out:0, sids: new Set() };
+    if (action === 'rsvp_in') groups[key].rsvp_in++;
+    if (action === 'rsvp_out') groups[key].rsvp_out++;
+    var sidHash = r[1] || '';
+    if (sidHash) groups[key].sids.add(sidHash);
+  });
+
+  var agg = ss.getSheetByName('DailyAggregates') || ss.insertSheet('DailyAggregates');
+  agg.clear();
+  agg.appendRow(['date','event_id','rsvp_in_count','rsvp_out_count','unique_sids']);
+  Object.keys(groups).forEach(function(k){
+    var g = groups[k];
+    agg.appendRow([g.date, g.event, g.rsvp_in, g.rsvp_out, g.sids.size]);
+  });
+}
+```
+
+Add this appendix to `BACKEND-SETUP.md` and wire a cron trigger for `rollDailyAggregates`. Keep `PEPPER` in Script Properties and rotate it if leaked.
+
+
+## 14. Out of scope (YAGNI)
+
+Explicitly **not** building in the initial implementation: maybe/no responses (just in/out), comments or chat on events, editing someone else's RSVP, server-side token verification (optional future enhancement — not planned for launch), realtime live updates (fetch-on-load + refresh-on-action suffices at friend scale), "who came" rosters on past Memories, and real counts on the Home carousel cards.
 
 ---
 
-## 13. Workstream independence
+## 15. Workstream independence
 
 #1 (RSVP) and #2 (perf swap) are independent and can be implemented/shipped separately. #2 is a small self-contained `index.html` change; #1 is the substantive feature. The implementation plan may sequence #2 first (trivial, low-risk) or run them in parallel.
