@@ -1,0 +1,15 @@
+{
+  "name": "the-group-chat-irl",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Group Chat: IRL — social calendar site",
+  "scripts": {
+    "test": "node --test tests/",
+    "transpile-check": "node tests/transpile-check.js",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@babel/standalone": "7.29.0",
+    "@playwright/test": "^1.48.0"
+  }
+}

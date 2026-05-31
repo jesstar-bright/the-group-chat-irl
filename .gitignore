@@ -4,3 +4,8 @@ dashboard.html
 
 # OS cruft
 .DS_Store
+
+# Node tooling (tests only — the site itself ships no build)
+node_modules/
+test-results/
+playwright-report/
