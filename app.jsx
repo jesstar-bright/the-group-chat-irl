@@ -293,8 +293,8 @@ function EventDetail({ ev, nav, share, addCal, rsvp, rsvpOn }) {
 
       <div className="pad" style={{ marginTop: 22 }}>
         <div className="whoin">
-          <div><div className="lbl">{6 + (ev.id.length % 5)} friends are in</div><div style={{ marginTop: 8 }}><Faces /></div></div>
-          <button className={'rsvp' + (rsvpOn ? ' on' : '')} onClick={rsvp}>{rsvpOn ? "You're in ✓" : "I'm in"}</button>
+          <div><div className="lbl">{/* RSVP HOOK */}<RSVP.Count eventId={ev.id} /></div><div style={{ marginTop: 8 }}>{/* RSVP HOOK */}<RSVP.Faces eventId={ev.id} /></div></div>
+          <button className={'rsvp' + (rsvpOn ? ' on' : '')} onClick={() => { rsvp(); /* RSVP HOOK */ RSVP.toggle(ev.id); }}>{rsvpOn ? "You're in ✓" : "I'm in"}</button>
         </div>
       </div>
 
